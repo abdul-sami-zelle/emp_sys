@@ -51,21 +51,10 @@ class LandingPage extends StatelessWidget {
                           mainAxisAlignment: MainAxisAlignment.start,
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Expanded(
-                              flex: 4,
-                              child:  Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 25),
-                            child: Column(
-                              children: [
-                                SizedBox(height: 10,),
-                                cappbar(),
-                              ],
-                            ),
-                          ),
-                            ),
+                           
                             Expanded(
                               flex: 30,
-                              child:Provider11.activeTab==0? SingleChildScrollView(
+                              child:Provider11.activeTab==4? SingleChildScrollView(
                                 child: Column(children: [
                                 
                                                        
@@ -139,7 +128,7 @@ class LandingPage extends StatelessWidget {
                                 ),
                                                           ),),
                                                           ],),
-                              ):Provider11.activeTab==1?TimeTrakingReports():Provider11.activeTab==2?AttendanceData():Container()),
+                              ):Provider11.activeTab==1?TimeTrakingReports():Provider11.activeTab==0?AttendanceData():Container()),
                           
                           ],
                         ),

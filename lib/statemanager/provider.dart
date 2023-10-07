@@ -593,8 +593,87 @@ if (snapshot.exists) {
 }
 
 
+String differenceShiftTime(String? time1, String? time2) {
+  if (time1 ==null || time2 ==null) {
+    return "null";
+  } else {
+     // Parse the string times into DateTime objects
+  DateFormat format = DateFormat("HH:mm:ss");
+  DateTime dateTime1 = format.parse(time1);
+  DateTime dateTime2 = format.parse(time2);
+ 
+  // Calculate the time difference
+  Duration difference = dateTime2.difference(dateTime1);
+
+  // Convert the time difference to hours
+  String hoursDifference = (difference.inMinutes / 60.0).toString().substring(0,3);
+    // Extract hours, minutes, and seconds from the time difference
+  int hours = difference.inHours;
+  int minutes = (difference.inMinutes % 60);
+  int seconds = (difference.inSeconds % 60);
+
+  // Format the time difference as "HH:mm:ss"
+  String formattedDifference = '$hours:${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}';
+
+  return formattedDifference;
+
+  }
+  
+}
 
 
+List<String> timee = [];
+
+List<double> lateArrival = [];
+List<double> onTimemArrival = [];
+List<double> late15min = [];
+
+String? statusCategorization(String dailyArrival) {
+  String actualArrivalTime = "08:00:00 AM";
+
+  String arrivalCategory = categorizeArrival(actualArrivalTime, dailyArrival);
+  timee.add(arrivalCategory);
+  return arrivalCategory;
+}
+
+String categorizeArrival(String actualArrivalTime, String dailyArrival) {
+  // Parse the actual and daily arrival times
+  DateFormat format = DateFormat("hh:mm:ss a");
+  DateTime actualTime = format.parse(actualArrivalTime);
+
+  // Extract hours, minutes, and seconds from the daily arrival
+  List<String> dailyArrivalParts = dailyArrival.split(":");
+  int dailyHours = int.parse(dailyArrivalParts[0]);
+  int dailyMinutes = int.parse(dailyArrivalParts[1]);
+  int dailySeconds = int.parse(dailyArrivalParts[2]);
+
+  // Create a DateTime object for the daily arrival time
+  DateTime dailyTime = DateTime(
+    actualTime.year,
+    actualTime.month,
+    actualTime.day,
+    dailyHours,
+    dailyMinutes,
+    dailySeconds,
+  );
+
+  // Define a threshold of 15 minutes
+  Duration lateThreshold = Duration(minutes: 15);
+
+  // Calculate the time difference
+  Duration timeDifference = dailyTime.difference(actualTime);
+
+  if (timeDifference > lateThreshold) {
+    print(timeDifference.inMinutes);
+    return "late";
+  } else if(timeDifference<Duration(minutes: 0,hours: 0,seconds: 0)){
+    return "early";
+  }
+  else {
+    print(timeDifference);
+    return "onTime";
+  }
+}
 
 
 
