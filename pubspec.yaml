@@ -65,6 +65,7 @@ dependencies:
   sliding_switch: ^1.1.0
   connectivity_plus: ^4.0.2
   firebase_database: ^10.2.7
+  syncfusion_flutter_pdf: ^23.1.39
 
 dev_dependencies:
   flutter_test:
@@ -90,7 +91,13 @@ flutter:
 
   # To add assets to your application, add an assets section, like this:
   assets:
-    - assets/images/
+    - assets/images/footer.png
+    - assets/images/header.png
+    - assets/images/in.png
+    - assets/images/out1.png
+    - assets/images/totalHours.png
+    - assets/images/leave.png
+    - assets/images/off.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

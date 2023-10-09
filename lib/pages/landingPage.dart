@@ -1,4 +1,5 @@
 import 'package:emp_sys/pages/attendanceData.dart';
+import 'package:emp_sys/pages/reports.dart';
 import 'package:emp_sys/pages/timeTrackingData.dart';
 import 'package:emp_sys/statemanager/provider.dart';
 import 'package:emp_sys/widgets/attendanceChart.dart';
@@ -10,6 +11,7 @@ import 'package:emp_sys/widgets/lastStats.dart';
 import 'package:emp_sys/widgets/left_panel.dart';
 import 'package:emp_sys/widgets/multi.dart';
 import 'package:emp_sys/widgets/pieChart.dart';
+import 'package:emp_sys/widgets/reportCards.dart';
 import 'package:emp_sys/widgets/shift_buttons.dart';
 import 'package:emp_sys/widgets/sideBarLeft.dart';
 import 'package:emp_sys/widgets/startShiftButton.dart';
@@ -128,7 +130,7 @@ class LandingPage extends StatelessWidget {
                                 ),
                                                           ),),
                                                           ],),
-                              ):Provider11.activeTab==1?TimeTrakingReports():Provider11.activeTab==0?AttendanceData():Container()),
+                              ):Provider11.activeTab==1?TimeTrakingReports():Provider11.activeTab==0?AttendanceData():Provider11.activeTab==3?Reports():Container()),
                           
                           ],
                         ),

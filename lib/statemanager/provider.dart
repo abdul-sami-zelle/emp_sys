@@ -593,8 +593,12 @@ if (snapshot.exists) {
 }
 
 
+
+
 String differenceShiftTime(String? time1, String? time2) {
-  if (time1 ==null || time2 ==null) {
+  
+  if ((time1 == null )|| (time2 == null)) {
+    print("${time2} here is time 2");
     return "null";
   } else {
      // Parse the string times into DateTime objects
@@ -701,6 +705,39 @@ String timeDifference(String time1,String time2) {
   
   return "$hours:$minutes:$seconds" ;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+String getTimeDifference(String startTimeStr, String endTimeStr) {
+  List<int> startTimeParts = startTimeStr.split(':').map(int.parse).toList();
+  List<int> endTimeParts = endTimeStr.split(':').map(int.parse).toList();
+
+  DateTime startTime = DateTime(0, 1, 1, startTimeParts[0], startTimeParts[1], startTimeParts[2]);
+  DateTime endTime = DateTime(0, 1, 1, endTimeParts[0], endTimeParts[1], endTimeParts[2]);
+
+  Duration difference = endTime.difference(startTime);
+
+  String twoDigits(int n) => n.toString().padLeft(2, '0');
+  int hours = difference.inHours;
+  int minutes = difference.inMinutes % 60;
+  int seconds = difference.inSeconds % 60;
+
+  return '${twoDigits(hours)}:${twoDigits(minutes)}:${twoDigits(seconds)}';
+}
+
 
 
 
@@ -997,7 +1034,7 @@ checkInternetConnectivity() async {
   var summit_break_dict={};
   var summit_break_list =[];
 
-  int activeTab = 0;
+  int activeTab = 3;
 
   changeSideTab(int tabIndex) {
     activeTab = tabIndex;
