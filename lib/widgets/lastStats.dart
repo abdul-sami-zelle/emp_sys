@@ -29,7 +29,7 @@ class LastStatis extends StatelessWidget {
                                   subtitle: "Last Check in",
                                   weight: FontWeight.bold,
                                   size: 3.5),
-                                          Image.network("https://firebasestorage.googleapis.com/v0/b/zelleclients.appspot.com/o/in.png?alt=media&token=cd3a80bc-0efd-4a40-ac40-3e4609d7a5a3",height: 35,width: 35,),
+                                          Image.asset("assets/images/in.png",height: 35,width: 35,),
                                         ],
                                       ),
                                       Column(
@@ -80,7 +80,7 @@ class LastStatis extends StatelessWidget {
                                   subtitle: "Last Check Out",
                                   weight: FontWeight.bold,
                                   size: 3.5),
-                                          Image.network("https://firebasestorage.googleapis.com/v0/b/zelleclients.appspot.com/o/out1.png?alt=media&token=7d2a1348-032e-41fd-a1b4-ade453a7e528",height: 35,width: 35,),
+                                          Image.asset("assets/images/out1.png",height: 35,width: 35,),
                                         ],
                                       ),
                                       Column(
@@ -138,7 +138,7 @@ class LastStatis extends StatelessWidget {
                                   subtitle: "Last Shift Start",
                                   weight: FontWeight.bold,
                                   size: 3.5),
-                                          Image.network("https://firebasestorage.googleapis.com/v0/b/zelleclients.appspot.com/o/shiftStart.png?alt=media&token=29a61c0e-7330-4324-82ef-e0ad4273f71c",height: 30,width: 30,),
+                                          Image.network("assets/images/shiftStart.png",height: 30,width: 30,),
                                         ],
                                       ),
                                       Column(
@@ -189,7 +189,7 @@ class LastStatis extends StatelessWidget {
                                   subtitle: "Last Shift End",
                                   weight: FontWeight.bold,
                                   size: 3.5),
-                                          Image.network("https://firebasestorage.googleapis.com/v0/b/zelleclients.appspot.com/o/shiftend.png?alt=media&token=99e1ed36-6cfd-42de-b5c1-cd48d0b4c770",height: 30,width: 30,),
+                                          Image.network("assets/images/shiftend.png",height: 30,width: 30,),
                                         ],
                                       ),
                                       Column(

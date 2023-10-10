@@ -85,7 +85,7 @@ class UpperTabs extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Image.network(
+                            Image.asset(
                               "${img}",
                               height: 35,
                               width: 35,

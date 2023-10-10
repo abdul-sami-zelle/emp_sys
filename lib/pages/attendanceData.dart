@@ -24,6 +24,15 @@ import 'dart:convert';
 import 'dart:html';
 import 'dart:ui';
 import 'package:http/http.dart' show get;
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:syncfusion_flutter_charts/charts.dart';
+import 'dart:typed_data';
+import 'dart:ui' as ui;
+
+
+
+
 
 class AttendanceData extends StatefulWidget {
    AttendanceData({super.key});
@@ -37,90 +46,16 @@ class _AttendanceDataState extends State<AttendanceData> {
   
  ScrollController _scrollController = ScrollController();
 
-  List<TimeTrackingData> dataa=[];
-
-  Future<List<TimeTrackingData>> generatedList()async{
-    var response = await http.get(Uri.parse("https://jsonplaceholder.typicode.com/users"));
-    var decodedData = json.decode(response.body).cast<Map<String,dynamic>>();
-     dataa = await decodedData.map<TimeTrackingData>((json)=>TimeTrackingData.fromJson(json)).toList();
-    print(dataa);
-    return dataa;
-  }
 
 List<AttendanceChartData1> graphData = [];
 List<Timings> attendanceDataPdf = [];
 
-var attendanceMonths = [];
 
-var data2 = {};
+
+
 
 String _selectedValue =  DateFormat('MMMM yyyy').format(DateTime.now());
 
-Future fetchAttendanceMonths()async{
-  final ref = FirebaseDatabase.instance.ref();
-final snapshot = await ref.child('attendence').get();
-if (snapshot.exists) {
-    data2 = snapshot.value as Map<String,dynamic>;
-   attendanceMonths= data2.keys.toList();
-} else {
-    print('No data available.');
-}
-return attendanceMonths;
-
-}
-
-DateTime convertStringToDateTime(String dateString) {
-  // Define the date format
-  DateFormat format = DateFormat("dd-MM-yyyy");
-
-  // Parse the string into a DateTime object
-  DateTime dt = format.parse(dateString);
-
-  return dt;
-}
-
-Map<String, dynamic> sorting( Map<String, dynamic> uidData) {
-
-
-  // Parse and sort the keys as DateTime objects
-  List<String> sortedKeys = uidData.keys.toList()
-    ..sort((a, b) {
-      var aParts = a.split('-').map(int.parse).toList();
-      var bParts = b.split('-').map(int.parse).toList();
-      var aDate = DateTime(aParts[2], aParts[1], aParts[0]);
-      var bDate = DateTime(bParts[2], bParts[1], bParts[0]);
-      return aDate.compareTo(bDate);
-    });
-
-  // Create a new map with sorted keys
-  Map<String, dynamic> sortedUidData = {};
-  for (var key in sortedKeys) {
-    sortedUidData[key] = uidData[key];
-  }
-
-  // Print the sorted map
-  return sortedUidData;
-}
-
-
-
-
-String getTimeDifference(String startTimeStr, String endTimeStr) {
-  List<int> startTimeParts = startTimeStr.split(':').map(int.parse).toList();
-  List<int> endTimeParts = endTimeStr.split(':').map(int.parse).toList();
-
-  DateTime startTime = DateTime(0, 1, 1, startTimeParts[0], startTimeParts[1], startTimeParts[2]);
-  DateTime endTime = DateTime(0, 1, 1, endTimeParts[0], endTimeParts[1], endTimeParts[2]);
-
-  Duration difference = endTime.difference(startTime);
-
-  String twoDigits(int n) => n.toString().padLeft(2, '0');
-  int hours = difference.inHours;
-  int minutes = difference.inMinutes % 60;
-  int seconds = difference.inSeconds % 60;
-
-  return '${twoDigits(hours)}:${twoDigits(minutes)}:${twoDigits(seconds)}';
-}
 
 
 
@@ -128,34 +63,8 @@ String getTimeDifference(String startTimeStr, String endTimeStr) {
 
 
 
-String? differenceShiftTime(String? time1, String? time2) {
 
-  if (time1 ==null || time2 ==null) {
-    return "null";
-  } else {
-     // Parse the string times into DateTime objects
-  DateFormat format = DateFormat("HH:mm:ss");
-  DateTime dateTime1 = format.parse(time1);
-  DateTime dateTime2 = format.parse(time2);
- 
-  // Calculate the time difference
-  Duration difference = dateTime2.difference(dateTime1);
 
-  // Convert the time difference to hours
-  String hoursDifference = (difference.inMinutes / 60.0).toString().substring(0,3);
-    // Extract hours, minutes, and seconds from the time difference
-  int hours = difference.inHours;
-  int minutes = (difference.inMinutes % 60);
-  int seconds = (difference.inSeconds % 60);
-
-  // Format the time difference as "HH:mm:ss"
-  String formattedDifference = '$hours:${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}';
-
-  return formattedDifference;
-
-  }
-  
-}
 
 String? statusCategorization(String dailyArrival) {
   String actualArrivalTime = "08:00:00 AM";
@@ -212,108 +121,18 @@ String categorizeArrival(String actualArrivalTime, String dailyArrival) {
   }
 }
 
+List<int>? imgGraph;
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-String? statusCategorization2(String dailyArrival) {
-  String actualArrivalTime = "08:00:00 AM";
-
-  String arrivalCategory = categorizeArrival2(actualArrivalTime, dailyArrival);
-  return arrivalCategory;
+   Future<List?> _renderChartAsImage() async {
+  final double pixelRatio = 2.0; // Try using a lower pixel ratio (e.g., 2.0)
+  final ui.Image data = await _cartesianChartKey.currentState!.toImage(pixelRatio: pixelRatio);
+  final ByteData? bytes = await data.toByteData(format: ui.ImageByteFormat.png);
+  final Uint8List imageBytes = bytes!.buffer.asUint8List(bytes.offsetInBytes, bytes.lengthInBytes);
+  imgGraph=imageBytes;
+  print(imgGraph);
+  return imageBytes;
 }
-
-String categorizeArrival2(String actualArrivalTime, String dailyArrival) {
-  // Parse the actual and daily arrival times
-  DateFormat format = DateFormat("hh:mm:ss a");
-  DateTime actualTime = format.parse(actualArrivalTime);
-
-  // Extract hours, minutes, and seconds from the daily arrival
-  List<String> dailyArrivalParts = dailyArrival.split(":");
-  int dailyHours = int.parse(dailyArrivalParts[0]);
-  int dailyMinutes = int.parse(dailyArrivalParts[1]);
-  int dailySeconds = int.parse(dailyArrivalParts[2]);
-
-  // Create a DateTime object for the daily arrival time
-  DateTime dailyTime = DateTime(
-    actualTime.year,
-    actualTime.month,
-    actualTime.day,
-    dailyHours,
-    dailyMinutes,
-    dailySeconds,
-  );
-
-  // Define a threshold of 15 minutes
-  Duration lateThreshold = Duration(minutes: 15);
-
-  // Calculate the time difference
-  Duration timeDifference = dailyTime.difference(actualTime);
-
-  if (timeDifference > lateThreshold) {
-    return "late";
-  } 
-  else if(timeDifference <= lateThreshold && timeDifference>Duration(minutes: 0,hours: 0,seconds: 0)){
-    return "on Time";
-  }
-  else {
-    return "early";
-  }
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -325,11 +144,30 @@ List<double> late15min = [];
 
 int index = 0; 
 
-  var attenData = [];
+var attenData = [];
 
-  var attenDates = [];
+var attenDates = [];
 
-Future fetchFireBaseData()async{
+late GlobalKey<SfCartesianChartState> _cartesianChartKey;
+
+
+
+
+
+
+
+  Widget build(BuildContext context) {
+    _cartesianChartKey = GlobalKey();
+    final size = MediaQuery.of(context).size;
+    final Provider11 = Provider.of<Provider1>(context, listen: true);
+    Future fetchFireBaseData()async{
+         attenData = [];
+ lateArrival = [];
+
+ onTimemArrival = [];
+
+ late15min = [];
+   attenDates = [];
   final ref = FirebaseDatabase.instance.ref();
 final snapshot = await ref.child('attendence/${_selectedValue}/Day').get();
 if (snapshot.exists) {
@@ -339,7 +177,7 @@ if (snapshot.exists) {
     final Map<String, dynamic> uidData = {};
     
     // Specify the UID you want to retrieve
-    final desiredUid = "42U9MUNIkoSiv943azxqjCVV4xa2";
+    final desiredUid = "2dCXtkkraFST33jeRvgG4WWkT9i2";
 
     // Loop through the data and extract data for the desired UID
     data.forEach((date, dateData) {
@@ -354,10 +192,10 @@ if (snapshot.exists) {
     });
     print("${uidData} data is herere");
 
-    final Map<String, dynamic> finalData = sorting(uidData);
+    final Map<String, dynamic> finalData = Provider11.sorting(uidData);
     for (var i = 0; i < finalData.length; i++) {
       print("${finalData.keys.toList()[i]} ---> ${i}");
-        attendanceDataPdf.add(Timings(checkin:finalData.values.toList()[i]['checkin']==null?"null":finalData.values.toList()[i]['checkin'], checkout:finalData.values.toList()[i]['checkout']==null?"null":finalData.values.toList()[i]['checkout'], date:finalData.keys.toList()[i].toString(), workingHours:finalData.values.toList()[i]['checkin']==null||finalData.values.toList()[i]['checkout']==null?"nil": getTimeDifference(finalData.values.toList()[i]['checkin'].toString(),finalData.values.toList()[i]['checkout'].toString()), status:finalData.values.toList()[i]['checkin']==null?"nil": statusCategorization2(finalData.values.toList()[i]['checkin'].toString())));
+        attendanceDataPdf.add(Timings(checkin:finalData.values.toList()[i]['checkin']==null?"null":finalData.values.toList()[i]['checkin'], checkout:finalData.values.toList()[i]['checkout']==null?"null":finalData.values.toList()[i]['checkout'], date:finalData.keys.toList()[i].toString(), workingHours:finalData.values.toList()[i]['checkin']==null||finalData.values.toList()[i]['checkout']==null?"nil": Provider11.getTimeDifference(finalData.values.toList()[i]['checkin'].toString(),finalData.values.toList()[i]['checkout'].toString()), status:finalData.values.toList()[i]['checkin']==null?"nil": Provider11.statusCategorization2(finalData.values.toList()[i]['checkin'].toString())));
 
     }
     // Print the extracted data for the specified UID
@@ -383,16 +221,7 @@ if (snapshot.exists) {
 
 return attenData;
 }
-
-
-
-
-
-  Widget build(BuildContext context) {
-    final size = MediaQuery.of(context).size;
-    final Provider11 = Provider.of<Provider1>(context, listen: true);
     return  Scrollbar(
-      showTrackOnHover: true,
       child: ListView(
         primary: true,
         scrollDirection: Axis.vertical,
@@ -446,20 +275,7 @@ return attenData;
                                                          ),
                                   ),
                                   SizedBox(width: 15,),
-                                  InkWell(
-                                    onTap: (){
-                                      Provider11.changeTimeTrackTab(1);
-                                    },
-                                    child: Row(
-                                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                                          mainAxisAlignment: MainAxisAlignment.start,
-                                                          children: [
-                                                            Image.network("https://cdn-icons-png.flaticon.com/128/126/126425.png",height: 14,width: 14,color:Provider11.activeTabTimeTracked==1?Colors.white:Color(0xff8F95A2),),
-                                                            SizedBox(width: 5,),
-                                                            Multi(color: Provider11.activeTabTimeTracked==1?Colors.white:Color(0xff8F95A2), subtitle: "Graphical Illustration", weight: FontWeight.w500, size: 3)
-                                                          ],
-                                                         ),
-                                  ),
+                                  
                                  
                                 ],
                               ),
@@ -471,7 +287,7 @@ return attenData;
       
                                   FutureBuilder(
                               
-                                      future: fetchAttendanceMonths(),
+                                      future: Provider11.fetchAttendanceMonths(),
                                       initialData: "Code sample",
                                       builder: (BuildContext context, snapshot) {
                                         if (snapshot.connectionState == ConnectionState.waiting) {
@@ -553,8 +369,9 @@ return attenData;
       
                                 
                                    GestureDetector(
-                                    onTap: (){
-                                      PdfService().printCustomersPdf(attendanceDataPdf);
+                                    onTap: () async{
+                                     await _renderChartAsImage();
+                                      PdfService().printCustomersPdf(attendanceDataPdf,imgGraph);
                                     },
                                     child: Image.network("https://cdn-icons-png.flaticon.com/128/5261/5261933.png",height: 20,width: 20,color:Colors.white,)),
                                  ],
@@ -587,7 +404,10 @@ return attenData;
                                               );
                                             } else if (snapshot.hasData) {
                                               final data = snapshot.data;
-                                              return  GridView.builder(
+                                              return  ListView(
+                                                shrinkWrap: true,
+                                                children: [
+                                                  GridView.builder(
                                         physics: NeverScrollableScrollPhysics(),
                                             shrinkWrap: true,
                                           gridDelegate:  SliverGridDelegateWithFixedCrossAxisCount(
@@ -595,65 +415,42 @@ return attenData;
                                             ,crossAxisSpacing: 15,
                                             mainAxisSpacing: 15,
                                             childAspectRatio:3
-                                              
+                                                  
                                             ),
                                           itemCount: attenData.length,
                                           itemBuilder: (BuildContext context, int index) {
                                          
                                             return  GestureDetector(
-                                              onTap: (){
+                                                  onTap: (){
                                              
-                                              },
-                                              child: AttendenceBox(checkin: attenData[index]['checkin'].toString(), checkout: attenData[index]['checkout'].toString(), hours: 
+                                                  },
+                                                  child: AttendenceBox(checkin: attenData[index]['checkin'].toString(), checkout: attenData[index]['checkout'].toString(), hours: 
                                   ((attenData[index]['checkin'].toString()=="null") || (attenData[index]['checkout'].toString()=="null"))?  "null":  Provider11.differenceShiftTime(attenData[index]['checkin'].toString(),attenData[index]['checkout'].toString()), dates: attenDates[index].toString(), status:attenData[index]['checkin'].toString()=="null"?"null": Provider11.statusCategorization(attenData[index]['checkin'].toString()).toString(),)
                                             );
                                           },
-                                        );
-                                            }
-                                          }
-                              
-                                          return const Center(
-                                            child: CircularProgressIndicator(),
-                                          );
-                                        },
-                                    
-                              ),
-                        ):Container(),
-                       Provider11.activeTabTimeTracked==1?Column(
-                         children: [
-      
-      
-      
-      
-      
-                            FutureBuilder(
-                              
-                                      future: fetchFireBaseData(),
-                                      initialData: "Code sample",
-                                      builder: (BuildContext context, snapshot) {
-                                        if (snapshot.connectionState == ConnectionState.waiting) {
-                                          return const Center(
-                                            child: CircularProgressIndicator(
-                                              color: Colors.deepPurpleAccent,
-                                            ),
-                                          );
-                                        }
-                                        if (snapshot.connectionState == ConnectionState.done) {
-                                          if (snapshot.hasError) {
-                                            return Center(
-                                              child: Text(
-                                                'An ${snapshot.error} occurred',
-                                                style: const TextStyle(fontSize: 18, color: Colors.red),
-                                              ),
-                                            );
-                                          } else if (snapshot.hasData) {
-                                            final data = snapshot.data;
-                                            return  
-      Container(
+                                        ),
+                                        SizedBox(height: 40,),
+                                        InkWell(
+                                    onTap: (){
+                                      Provider11.changeTimeTrackTab(1);
+                                    },
+                                    child: Row(
+                                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                                          mainAxisAlignment: MainAxisAlignment.start,
+                                                          children: [
+                                                            Image.network("https://cdn-icons-png.flaticon.com/128/126/126425.png",height: 14,width: 14,color:Colors.white),
+                                                            SizedBox(width: 5,),
+                                                            Multi(color:Colors.white, subtitle: "Graphical Illustration", weight: FontWeight.w500, size: 3)
+                                                          ],
+                                                         ),
+                                  ),
+                                  SizedBox(height: 30,),
+                                         Container(
             height: 400,
             child: Column(
               children: [
                 SfCartesianChart(
+                  key: _cartesianChartKey,
                     plotAreaBorderWidth: 0,
                     primaryXAxis: CategoryAxis(
                       //Hide the gridlines of x-axis
@@ -706,31 +503,22 @@ child: Row(
 ),
                 )
               ],
-            ));
-      
-      
-                                    
+            ))
+                                                ],
+                                              );
+                                            }
                                           }
-                                        }
-                            
-                                        return const Center(
-                                          child: CircularProgressIndicator(),
-                                        );
-                                      },
-                                  
-                            ),
-      
-      
-      
-      
-      
-      
-      
-                            
-      
-                           
-                         ],
-                       ):Container(),
+                              
+                                          return const Center(
+                                            child: CircularProgressIndicator(),
+                                          );
+                                        },
+                                    
+                              ),
+                        ):Container(),
+                     
+
+                     
               
               
                   
@@ -747,9 +535,7 @@ child: Row(
         
     
     
-    ElevatedButton(onPressed: (){
-      generatedList();
-    }, child: Text("data"));
+   
   }
 }
 
@@ -764,7 +550,7 @@ class AttendanceChartData1 {
 }
 
 
-  class ChartData {
+class ChartData {
         ChartData(this.x,this.x2,this.x3, this.y);
         final int x;
         final int x2;
@@ -772,35 +558,7 @@ class AttendanceChartData1 {
         final double? y;
 
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    class Timings{
+class Timings{
       String? date;
   String? checkin;
   String? checkout;
@@ -819,7 +577,7 @@ class AttendanceChartData1 {
 
 
 class PdfService {
-  Future<void> printCustomersPdf(List<Timings> data) async {
+  Future<void> printCustomersPdf(List<Timings> data,var graphData) async {
 
 
 //Create a new pdf document
@@ -846,64 +604,55 @@ document.template.top = header;
 
 //Add the footer at the bottom of the document
 document.template.bottom = footer;
+  
+
+
+  final ByteData assetData1 = await rootBundle.load('assets/images/footer.png');
+  final Uint8List imageBytes1 = assetData1.buffer.asUint8List();
+
+  final ByteData assetData2 = await rootBundle.load('assets/images/header.png');
+  final Uint8List imageBytes2 = assetData2.buffer.asUint8List();
+
+  // Create PdfBitmap objects from the asset images
+  final PdfBitmap image1 = PdfBitmap(imageBytes1);
+  final PdfBitmap image2 = PdfBitmap(imageBytes2);
 
 
 
-  // final ByteData assetData1 = await rootBundle.load('assets/images/footer.png');
-  // final Uint8List imageBytes1 = assetData1.buffer.asUint8List();
 
-  // final ByteData assetData2 = await rootBundle.load('assets/images/header.png');
-  // final Uint8List imageBytes2 = assetData2.buffer.asUint8List();
+  footer.graphics.drawImage(
+      image1,
+      Rect.fromLTWH(
+          0, 0, document.pageSettings.size.width, 80));
 
-  // // Create PdfBitmap objects from the asset images
-  // final PdfBitmap image1 = PdfBitmap(imageBytes1);
-  // final PdfBitmap image2 = PdfBitmap(imageBytes2);
+  header.graphics.drawImage(
+      image2,
+      Rect.fromLTWH(
+          0, 0, document.pageSettings.size.width, 100));
 
-  //Draw an image to the document.
-  // footer.graphics.drawImage(
-  //     image1,
-  //     Rect.fromLTWH(
-  //         0, 0, document.pageSettings.size.width, 80));
-  // header.graphics.drawImage(
-  //     image2,
-  //     Rect.fromLTWH(
-  //         0, 0, document.pageSettings.size.width, 100));
 
+
+
+
+
+
+  final PdfBitmap image3 = PdfBitmap(graphData);
 
     final PdfPage page = document.pages.add();
 
-     page.graphics.drawString(
-          'ClientName',
-          PdfStandardFont(PdfFontFamily.helvetica, 10,
-              style: PdfFontStyle.bold),
-          brush: PdfBrushes.black,
-          bounds: Rect.fromLTWH(50, 50, 300, 50));
 
-      page.graphics.drawString(
-          'EmployeeName',
-          PdfStandardFont(PdfFontFamily.helvetica, 10,
-              style: PdfFontStyle.bold),
-          brush: PdfBrushes.black,
-          bounds: Rect.fromLTWH(50, 115, 300, 50));
-
-      page.graphics.drawString(
-          'Effective Date',
-          PdfStandardFont(PdfFontFamily.helvetica, 10,
-              style: PdfFontStyle.bold),
-          brush: PdfBrushes.black,
-          bounds: Rect.fromPoints(Offset(300, 110), Offset(300, 110))
-          // bounds: Rect.fromLTWH(50, 130, 300, 50)
+       page.graphics.drawImage(
+           image3,
+      Rect.fromLTWH(
+          0, 0, document.pageSettings.size.width/1.2, 300),
+         
           );
 
-      page.graphics.drawString(
-          'Expiry Date',
-          PdfStandardFont(PdfFontFamily.helvetica, 10,
-              style: PdfFontStyle.bold),
-          brush: PdfBrushes.black,
-          bounds: Rect.fromPoints(Offset(420, 110), Offset(420, 110))
-          // bounds: Rect.fromLTWH(50, 130, 300, 50)
-          );
 
+
+
+
+      
 
 
 
@@ -989,7 +738,7 @@ document.template.bottom = footer;
     
     //Draw the grid
     grid.draw(
-        page: page, bounds: const Rect.fromLTWH(0, 100, 0, 0));    
+        page: page, bounds: const Rect.fromLTWH(0, 500, 0, 0));    
 
 
 

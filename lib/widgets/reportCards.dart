@@ -10,10 +10,15 @@ class ReportCards extends StatelessWidget {
   ReportCards({super.key,required this.imgAddress,required this.value,required this.heading,required this.subHeading});
 
   @override
+
+
+
+  
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
+    
     return Container(
-        height: 160,
+        height: 130,
       width: (size.width < 1320 && size.width > 1161)
           ? 170
           : (size.width < 1161)
@@ -22,7 +27,7 @@ class ReportCards extends StatelessWidget {
                   ? 230
                   : 210,
       decoration: BoxDecoration(
-          color: Color(0xff1F2123), borderRadius: BorderRadius.circular(10)),
+          color: Color(0xff414243), borderRadius: BorderRadius.circular(10)),
       child: Padding(
         padding:EdgeInsets.symmetric(horizontal: 10),
         child: Column(
@@ -34,7 +39,7 @@ class ReportCards extends StatelessWidget {
               children: [
                 Column(
                   children: [
-                    Multi(color: Colors.white, subtitle: "$value", weight: FontWeight.bold, size: 6),
+                    Multi(color: Colors.white, subtitle: "${value.toString()=="null"?"00":value}", weight: FontWeight.bold, size: 6),
                     Multi(color: Colors.green, subtitle: "$subHeading", weight: FontWeight.normal, size: 2.5),
                   ],
                 ),

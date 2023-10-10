@@ -106,7 +106,7 @@ class HomeScreen extends StatelessWidget {
              Center(
                     child: NeumorphicButton(
                   onTap: () {
-                    Provider11.fetchFireBaseData();
+                   
                   },
                   child: Container(
                     child: Column(

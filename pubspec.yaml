@@ -66,6 +66,7 @@ dependencies:
   connectivity_plus: ^4.0.2
   firebase_database: ^10.2.7
   syncfusion_flutter_pdf: ^23.1.39
+  firebase_storage: ^11.2.8
 
 dev_dependencies:
   flutter_test:
@@ -98,6 +99,13 @@ flutter:
     - assets/images/totalHours.png
     - assets/images/leave.png
     - assets/images/off.png
+    - assets/images/beads.png
+    - assets/images/breakfast.png
+    - assets/images/other.png
+    - assets/images/star.png
+    - assets/images/phone-call.png
+    - assets/images/shiftStart.png
+    - assets/images/shiftend.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

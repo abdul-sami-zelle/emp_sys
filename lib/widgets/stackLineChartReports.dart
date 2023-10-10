@@ -1,6 +1,11 @@
+import 'package:emp_sys/statemanager/provider.dart';
 import 'package:emp_sys/widgets/multi.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
+import 'dart:typed_data';
+import 'dart:ui' as ui;
+import 'dart:html' as html;
 
 class StackLineChart extends StatefulWidget {
   const StackLineChart({super.key});
@@ -11,8 +16,19 @@ class StackLineChart extends StatefulWidget {
   int? selectedOption;
 class _StackLineChartState extends State<StackLineChart> {
 @override
+late GlobalKey<SfCartesianChartState> _cartesianChartKey;
+late List<ChartData> _chartData;
+void initState() {
+ 
+
+  super.initState();
+}
+
     Widget build(BuildContext context) {
-      List<ChartData> chartData = [
+      _cartesianChartKey = GlobalKey();
+      final Provider11 = Provider.of<Provider1>(context, listen: true);
+      
+  _chartData = [
         ChartData("this", 2, 4, 6),
         ChartData("that", 7, 3, 2),
         ChartData("thos", 2, 4, 5),
@@ -23,56 +39,97 @@ class _StackLineChartState extends State<StackLineChart> {
 
 
       ];
+        Future<List?> _renderChartAsImage() async {
+  final double pixelRatio = 2.0; // Try using a lower pixel ratio (e.g., 2.0)
+  final ui.Image data = await _cartesianChartKey.currentState!.toImage(pixelRatio: pixelRatio);
+  final ByteData? bytes = await data.toByteData(format: ui.ImageByteFormat.png);
+  final Uint8List imageBytes = bytes!.buffer.asUint8List(bytes.offsetInBytes, bytes.lengthInBytes);
+
+  return imageBytes;
+}
+
     
          return  Container(
             decoration: BoxDecoration(
           color: Color(0xff1F2123), borderRadius: BorderRadius.circular(10)),
              child: Column(
                children: [
-               ListTile(
+      SizedBox(height: 20,),
+      Padding(
+        padding:EdgeInsets.symmetric(horizontal: 20),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
       
-      title: Multi(color: Colors.white, subtitle: "last month", weight: FontWeight.bold, size: 2.5),
-      leading: Radio(
-        activeColor: Colors.amber,
-        value: 1,
-        groupValue: selectedOption,
-        onChanged: (value) {
-          setState(() {
-            selectedOption = value!;
-          });
-        },
-      ),
-    ),
-   ListTile(
       
-      title: Multi(color: Colors.white, subtitle: "last 15 days", weight: FontWeight.bold, size: 2.5),
-      leading: Radio(
-        activeColor: Colors.amber,
-        value: 2,
-        groupValue: selectedOption,
-        onChanged: (value) {
-          setState(() {
-            selectedOption = value!;
-          });
-        },
-      ),
-    ),
-    ListTile(
+            Multi(color: Colors.white, subtitle: "Arrival Graph", weight: FontWeight.bold, size: 3.5),
       
-      title: Multi(color: Colors.white, subtitle: "last 7 days", weight: FontWeight.bold, size: 2.5),
-      leading: Radio(
-        activeColor: Colors.amber,
-        value: 3,
-        groupValue: selectedOption,
-        onChanged: (value) {
-          setState(() {
-            selectedOption = value!;
-          });
-        },
+      
+      
+      
+            Row(
+              children: [
+                        Row(
+                          children: [
+                            Radio(
+              fillColor: MaterialStateColor.resolveWith((states) => Colors.white),
+              activeColor: Colors.amber,
+              value: 1,
+              groupValue: selectedOption,
+              onChanged: (value) {
+                setState(() {
+                  selectedOption = value!;
+                });
+              },
+            
+          ),
+          Multi(color: Colors.white, subtitle: "last 7 days", weight: FontWeight.w500, size: 2.5),
+                          ],
+                        ),
+            SizedBox(width: 5,),
+        Row(
+          children: [
+            Radio(
+              fillColor: MaterialStateColor.resolveWith((states) => Colors.white),
+                  activeColor: Colors.amber,
+                  value: 2,
+                  groupValue: selectedOption,
+                  onChanged: (value) {
+                    setState(() {
+                      selectedOption = value!;
+                    });
+                  },
+                
+              ),
+            Multi(color: Colors.white, subtitle: "last 15 days", weight: FontWeight.w500, size: 2.5),
+          ],
+        ),
+        SizedBox(width: 5,),
+          Row(
+            children: [
+              Radio(
+                  fillColor: MaterialStateColor.resolveWith((states) => Colors.white),
+                  activeColor: Colors.amber,
+                  value: 3,
+                  groupValue: selectedOption,
+                  onChanged: (value) {
+                    setState(() {
+                      selectedOption = value!;
+                    });
+                  },
+                ),
+              Multi(color: Colors.white, subtitle: "last 30 days", weight: FontWeight.w500, size: 2.5),
+            ],
+          ),
+          
+              ],
+            ),
+          ],
+        ),
       ),
-    ),
-
+  SizedBox(height: 20,),
                  SfCartesianChart(
+                   key: _cartesianChartKey,
                      primaryXAxis: CategoryAxis(
                           //Hide the gridlines of x-axis 
          majorGridLines: MajorGridLines(width: 0), 
@@ -85,7 +142,7 @@ class _StackLineChartState extends State<StackLineChart> {
                             markerSettings: MarkerSettings(
                              isVisible: true
                             ),
-                             dataSource: chartData,
+                             dataSource: _chartData,
                              xValueMapper: (ChartData data, _) => data.x,
                              yValueMapper: (ChartData data, _) => data.y1
                          ),
@@ -93,7 +150,7 @@ class _StackLineChartState extends State<StackLineChart> {
                            markerSettings: MarkerSettings(
                              isVisible: true
                             ),
-                             dataSource: chartData,
+                             dataSource: _chartData,
                              xValueMapper: (ChartData data, _) => data.x,
                              yValueMapper: (ChartData data, _) => data.y2
                          ),
@@ -101,17 +158,26 @@ class _StackLineChartState extends State<StackLineChart> {
                            markerSettings: MarkerSettings(
                              isVisible: true
                             ),
-                             dataSource: chartData,
+                             dataSource: _chartData,
                              xValueMapper: (ChartData data, _) => data.x,
                              yValueMapper: (ChartData data, _) => data.y3
                          ),
                        
                      ]
                  ),
+                  TextButton(
+        child: const Text('Export as image'),
+        onPressed: () {
+          _renderChartAsImage ();
+        },
+      )
                ],
              )
          );
     }
+
+
+
 }
 
 

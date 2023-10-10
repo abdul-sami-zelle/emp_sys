@@ -27,7 +27,7 @@ class SideBarLeft extends StatelessWidget {
           Column(
             children: [
               SizedBox(height: 20,),
-              Image.network("https://firebasestorage.googleapis.com/v0/b/zelleclients.appspot.com/o/logo.png?alt=media&token=6a5c4a91-466a-4ca6-89ca-1f4de948dfb8",height: 30,width: 30,),
+              Image.network("https://res.cloudinary.com/diecwxxmm/image/upload/v1696918288/zellesolutions%20portal/i9ikjvb1nyv580ezkcv8.png",height: 30,width: 30,),
               SizedBox(height: 40,),
                InkWell(
                 onTap: (){

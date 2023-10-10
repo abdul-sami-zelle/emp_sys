@@ -2,12 +2,23 @@ import 'dart:async';
 import 'dart:io';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:firebase_database/firebase_database.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
-
+import 'package:syncfusion_flutter_charts/charts.dart';
+import 'dart:html' as html;
+import 'dart:convert';
+import 'dart:html';
+import 'dart:ui';
+import 'package:http/http.dart' show get;
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:syncfusion_flutter_charts/charts.dart';
+import 'dart:typed_data';
+import 'dart:ui' as ui;
 import '../pages/landingPage.dart';
 
 // import 'dart:js' as js;
@@ -486,7 +497,24 @@ class Provider1 extends ChangeNotifier {
 
 
 
+// 
+
+// String getTimeDifference(String startTimeStr, String endTimeStr) {
+//   List<int> startTimeParts = startTimeStr.split(':').map(int.parse).toList();
+//   List<int> endTimeParts = endTimeStr.split(':').map(int.parse).toList();
+
+//   DateTime startTime = DateTime(0, 1, 1, startTimeParts[0], startTimeParts[1], startTimeParts[2]);
+//   DateTime endTime = DateTime(0, 1, 1, endTimeParts[0], endTimeParts[1], endTimeParts[2]);
+
+//   Duration difference = endTime.difference(startTime);
+
+//   String twoDigits(int n) => n.toString().padLeft(2, '0');
+//   int hours = difference.inHours;
+//   int minutes = difference.inMinutes % 60;
+//   int seconds = difference.inSeconds % 60;
 
+//   return '${twoDigits(hours)}:${twoDigits(minutes)}:${twoDigits(seconds)}';
+// }
 
 
 
@@ -494,19 +522,89 @@ class Provider1 extends ChangeNotifier {
 
 
 
+// String? differenceShiftTime(String? time1, String? time2) {
 
+//   if (time1 ==null || time2 ==null) {
+//     return "null";
+//   } else {
+//      // Parse the string times into DateTime objects
+//   DateFormat format = DateFormat("HH:mm:ss");
+//   DateTime dateTime1 = format.parse(time1);
+//   DateTime dateTime2 = format.parse(time2);
+ 
+//   // Calculate the time difference
+//   Duration difference = dateTime2.difference(dateTime1);
 
+//   // Convert the time difference to hours
+//   String hoursDifference = (difference.inMinutes / 60.0).toString().substring(0,3);
+//     // Extract hours, minutes, and seconds from the time difference
+//   int hours = difference.inHours;
+//   int minutes = (difference.inMinutes % 60);
+//   int seconds = (difference.inSeconds % 60);
 
+//   // Format the time difference as "HH:mm:ss"
+//   String formattedDifference = '$hours:${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}';
 
+//   return formattedDifference;
 
+//   }
+  
+// }
 
+// String? statusCategorization(String dailyArrival) {
+//   String actualArrivalTime = "08:00:00 AM";
 
+//   String arrivalCategory = categorizeArrival(actualArrivalTime, dailyArrival);
+//   return arrivalCategory;
+// }
 
+// String categorizeArrival(String actualArrivalTime, String dailyArrival) {
+//   // Parse the actual and daily arrival times
+//   DateFormat format = DateFormat("hh:mm:ss a");
+//   DateTime actualTime = format.parse(actualArrivalTime);
 
+//   // Extract hours, minutes, and seconds from the daily arrival
+//   List<String> dailyArrivalParts = dailyArrival.split(":");
+//   int dailyHours = int.parse(dailyArrivalParts[0]);
+//   int dailyMinutes = int.parse(dailyArrivalParts[1]);
+//   int dailySeconds = int.parse(dailyArrivalParts[2]);
 
+//   // Create a DateTime object for the daily arrival time
+//   DateTime dailyTime = DateTime(
+//     actualTime.year,
+//     actualTime.month,
+//     actualTime.day,
+//     dailyHours,
+//     dailyMinutes,
+//     dailySeconds,
+//   );
 
+//   // Define a threshold of 15 minutes
+//   Duration lateThreshold = Duration(minutes: 15);
 
+//   // Calculate the time difference
+//   Duration timeDifference = dailyTime.difference(actualTime);
 
+//   if (timeDifference > lateThreshold) {
+//     lateArrival.add(double.parse(timeDifference.inMinutes.toString()));
+//     late15min.add(0);
+//     onTimemArrival.add(0);
+//     return timeDifference.inMinutes.toString();
+//   } 
+//   else if(timeDifference <= lateThreshold && timeDifference>Duration(minutes: 0,hours: 0,seconds: 0)){
+//     lateArrival.add(0);
+//     onTimemArrival.add(0);
+//     late15min.add(double.parse(timeDifference.inMinutes.toString()));
+//     return timeDifference.inMinutes.toString();
+//   }
+//   else {
+//     print(timeDifference);
+//     lateArrival.add(0);
+//     late15min.add(0);
+//     onTimemArrival.add(double.parse(timeDifference.inMinutes<0?(timeDifference.inMinutes*-1).toString():timeDifference.inMinutes.toString()));
+//     return timeDifference.inMinutes.toString();
+//   }
+// }
 
 
 
@@ -529,13 +627,50 @@ class Provider1 extends ChangeNotifier {
 
 
 
+String? statusCategorization2(String dailyArrival) {
+  String actualArrivalTime = "08:00:00 AM";
 
+  String arrivalCategory = categorizeArrival2(actualArrivalTime, dailyArrival);
+  return arrivalCategory;
+}
 
+String categorizeArrival2(String actualArrivalTime, String dailyArrival) {
+  // Parse the actual and daily arrival times
+  DateFormat format = DateFormat("hh:mm:ss a");
+  DateTime actualTime = format.parse(actualArrivalTime);
 
+  // Extract hours, minutes, and seconds from the daily arrival
+  List<String> dailyArrivalParts = dailyArrival.split(":");
+  int dailyHours = int.parse(dailyArrivalParts[0]);
+  int dailyMinutes = int.parse(dailyArrivalParts[1]);
+  int dailySeconds = int.parse(dailyArrivalParts[2]);
 
+  // Create a DateTime object for the daily arrival time
+  DateTime dailyTime = DateTime(
+    actualTime.year,
+    actualTime.month,
+    actualTime.day,
+    dailyHours,
+    dailyMinutes,
+    dailySeconds,
+  );
 
+  // Define a threshold of 15 minutes
+  Duration lateThreshold = Duration(minutes: 15);
 
+  // Calculate the time difference
+  Duration timeDifference = dailyTime.difference(actualTime);
 
+  if (timeDifference > lateThreshold) {
+    return "late";
+  } 
+  else if(timeDifference <= lateThreshold && timeDifference>Duration(minutes: 0,hours: 0,seconds: 0)){
+    return "on Time";
+  }
+  else {
+    return "early";
+  }
+}
 
 
 
@@ -577,20 +712,267 @@ class Provider1 extends ChangeNotifier {
 
 
 
-var attenData = [];
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+List<AttendanceChartData1> graphData = [];
+List<Timings> attendanceDataPdf = [];
+
+
+
+
+
+
+
+Map<String, dynamic> sorting( Map<String, dynamic> uidData) {
+
+
+  // Parse and sort the keys as DateTime objects
+  List<String> sortedKeys = uidData.keys.toList()
+    ..sort((a, b) {
+      var aParts = a.split('-').map(int.parse).toList();
+      var bParts = b.split('-').map(int.parse).toList();
+      var aDate = DateTime(aParts[2], aParts[1], aParts[0]);
+      var bDate = DateTime(bParts[2], bParts[1], bParts[0]);
+      return aDate.compareTo(bDate);
+    });
+
+  // Create a new map with sorted keys
+  Map<String, dynamic> sortedUidData = {};
+  for (var key in sortedKeys) {
+    sortedUidData[key] = uidData[key];
+  }
+
+  // Print the sorted map
+  return sortedUidData;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// fetch all months:
+
 var data2 = {};
-fetchFireBaseData()async{
+var attendanceMonths = [];
+
+Future fetchAttendanceMonths()async{
   final ref = FirebaseDatabase.instance.ref();
 final snapshot = await ref.child('attendence').get();
 if (snapshot.exists) {
     data2 = snapshot.value as Map<String,dynamic>;
-    print(data2.keys.toList());
+   attendanceMonths= data2.keys.toList();
+} else {
+    print('No data available.');
+}
+return attendanceMonths;
+
+}
+
+
+
+
+//fetch attendance data 
+
+
+void increament(){
+  index++;
+
+}
+
+void decreament(){
+  index--;
+  
+}
+
+List<double> lateArrival = [];
+
+List<double> onTimemArrival = [];
+
+List<double> late15min = [];
+
+int index = 0; 
+
+  var attenData = [];
+
+  var attenDates = [];
+
+  late GlobalKey<SfCartesianChartState> _cartesianChartKey;
+
+Future fetchFireBaseData(String selectedValue)async{
+  final ref = FirebaseDatabase.instance.ref();
+final snapshot = await ref.child('attendence/${selectedValue}/Day').get();
+if (snapshot.exists) {
+  final Map<String, dynamic> data = snapshot.value as Map<String, dynamic>;
+
+    // Initialize an empty Map to store the data for the specified UID
+    final Map<String, dynamic> uidData = {};
+    
+    // Specify the UID you want to retrieve
+    final desiredUid = "2dCXtkkraFST33jeRvgG4WWkT9i2";
+
+    // Loop through the data and extract data for the desired UID
+    data.forEach((date, dateData) {
+      if (dateData.containsKey(desiredUid)) {
+        increament();
+       
+        uidData[date] = dateData[desiredUid];
+       
+        print(uidData[date]['checkin'].toString());
+        uidData[date]['checkin']==null?decreament():graphData.add(AttendanceChartData1(x: date, y:statusCategorization(uidData[date]['checkin']), early: onTimemArrival[index-1], late: lateArrival[index-1], late15:late15min[index-1]));
+      }
+    });
+    print("${uidData} data is herere");
+
+    final Map<String, dynamic> finalData = sorting(uidData);
+    for (var i = 0; i < finalData.length; i++) {
+      print("${finalData.keys.toList()[i]} ---> ${i}");
+        attendanceDataPdf.add(Timings(checkin:finalData.values.toList()[i]['checkin']==null?"null":finalData.values.toList()[i]['checkin'], checkout:finalData.values.toList()[i]['checkout']==null?"null":finalData.values.toList()[i]['checkout'], date:finalData.keys.toList()[i].toString(), workingHours:finalData.values.toList()[i]['checkin']==null||finalData.values.toList()[i]['checkout']==null?"nil": getTimeDifference(finalData.values.toList()[i]['checkin'].toString(),finalData.values.toList()[i]['checkout'].toString()), status:finalData.values.toList()[i]['checkin']==null?"nil": statusCategorization2(finalData.values.toList()[i]['checkin'].toString())));
+
+    }
+    // Print the extracted data for the specified UID
+    attenData=finalData.values.toList();
+    attenDates = finalData.keys.toList();
+    print(lateArrival);
+    print(onTimemArrival);
+    print(late15min);
+
+    for (var i = 0; i < graphData.length; i++) {
+      print("${graphData[i].early}  ${graphData[i].late}  ${graphData[i].late15}");
+    }
+
+   
+    
 } else {
     print('No data available.');
 }
 
 
+
+
+
+return attenData;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+List<int>? imgGraph;
+
+
+   Future<List?> renderChartAsImage() async {
+  final double pixelRatio = 2.0; // Try using a lower pixel ratio (e.g., 2.0)
+  final ui.Image data = await _cartesianChartKey.currentState!.toImage(pixelRatio: pixelRatio);
+  final ByteData? bytes = await data.toByteData(format: ui.ImageByteFormat.png);
+  final Uint8List imageBytes = bytes!.buffer.asUint8List(bytes.offsetInBytes, bytes.lengthInBytes);
+  imgGraph=imageBytes;
+  print(imgGraph);
+  return imageBytes;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  Future<String> downloadURLExample( String filePath) async {
+   String downloadURL = await FirebaseStorage.instance
+        .ref("$filePath")
+        .child("logo.png")
+        .getDownloadURL();
+    print(downloadURL);
+    return downloadURL;
+  }
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -628,9 +1010,6 @@ String differenceShiftTime(String? time1, String? time2) {
 
 List<String> timee = [];
 
-List<double> lateArrival = [];
-List<double> onTimemArrival = [];
-List<double> late15min = [];
 
 String? statusCategorization(String dailyArrival) {
   String actualArrivalTime = "08:00:00 AM";
@@ -1090,3 +1469,43 @@ class TimeTrackingData {
 
 
 
+
+
+
+
+
+class AttendanceChartData1 {
+  var x;
+  String? y;
+  double? early;
+  double? late;
+  double? late15;
+  AttendanceChartData1({required this.x,required this.y,required this.early,required this.late,required this.late15});
+}
+
+
+  class ChartData {
+        ChartData(this.x,this.x2,this.x3, this.y);
+        final int x;
+        final int x2;
+        final int x3;
+        final double? y;
+
+    }
+
+
+    class Timings{
+      String? date;
+  String? checkin;
+  String? checkout;
+  String? workingHours;
+  String? status;
+  
+  Timings({
+    required this.date,
+    required this.checkin,
+    required this.checkout,
+    required this.workingHours,
+    required this.status
+    });
+}

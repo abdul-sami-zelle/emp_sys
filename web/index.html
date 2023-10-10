@@ -40,6 +40,24 @@
   <script src="flutter.js" defer></script>
 </head>
 <body>
+  <script src="https://www.gstatic.com/firebasejs/8.6.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.6.1/firebase-storage.js"></script>
+   <script>
+     const firebaseConfig = {
+      apiKey: "AIzaSyCK58s4NYDEVj49-1FDQl7Ac8RIfxPwLlw",
+      appId: "1:1035510320142:web:a4576fd8893dc8461a405f",
+      messagingSenderId: "1035510320142",
+      projectId: "zelleclients",
+      storageBucket: "zelleclients.appspot.com",
+      authDomain: "zelleclients.firebaseapp.com",
+      databaseURL: "https://zelleclients-default-rtdb.firebaseio.com",
+     };
+ 
+     // Initialize Firebase
+     firebase.initializeApp(firebaseConfig);
+   </script>
+ 
+   <script src="main.dart.js" type="application/javascript"></script>
   <script>
     window.addEventListener('load', function(ev) {
       // Download main.dart.js
