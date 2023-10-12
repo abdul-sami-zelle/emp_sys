@@ -18,16 +18,16 @@ class ReportCards extends StatelessWidget {
     final size = MediaQuery.of(context).size;
     
     return Container(
-        height: 130,
+        height: 100,
       width: (size.width < 1320 && size.width > 1161)
-          ? 170
+          ? 140
           : (size.width < 1161)
-              ? 140
+              ? 110
               : (size.width > 1600)
-                  ? 230
-                  : 210,
+                  ? 200
+                  : 180,
       decoration: BoxDecoration(
-          color: Color(0xff414243), borderRadius: BorderRadius.circular(10)),
+          color: Color(0xff1F2123), borderRadius: BorderRadius.circular(10)),
       child: Padding(
         padding:EdgeInsets.symmetric(horizontal: 10),
         child: Column(
@@ -59,7 +59,7 @@ class ReportCards extends StatelessWidget {
               ],
             ),
             SizedBox(height: 20,),
-            Multi(color: Colors.white, subtitle: "$heading", weight: FontWeight.bold, size: 3.5)
+            Multi(color: Colors.white, subtitle: "$heading", weight: FontWeight.bold, size: 3)
           ],
         ),
       ),

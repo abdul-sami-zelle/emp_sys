@@ -29,6 +29,8 @@ import 'package:provider/provider.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 import 'dart:typed_data';
 import 'dart:ui' as ui;
+import 'package:http/http.dart' show get;
+
 
 
 
@@ -99,15 +101,28 @@ String categorizeArrival(String actualArrivalTime, String dailyArrival) {
 
 late GlobalKey<SfCircularChartState> _cartesianChartKey;
 
+late GlobalKey<SfCircularChartState> _cartesianChartKeyRadial;
+
+late GlobalKey<SfCartesianChartState> _cartesianChartKeyColumn;
+
 List<int>? imgGraph;
+List<int>? imgGraph2;
+List<int>? imgGraph3;
 
    Future<List?> _renderChartAsImage() async {
   final double pixelRatio = 2.0; // Try using a lower pixel ratio (e.g., 2.0)
   final ui.Image data = await _cartesianChartKey.currentState!.toImage(pixelRatio: pixelRatio);
+  final ui.Image data2 = await _cartesianChartKeyRadial.currentState!.toImage(pixelRatio: pixelRatio);
+  final ui.Image data3 = await _cartesianChartKeyColumn.currentState!.toImage(pixelRatio: pixelRatio);
   final ByteData? bytes = await data.toByteData(format: ui.ImageByteFormat.png);
+  final ByteData? bytes2 = await data2.toByteData(format: ui.ImageByteFormat.png);
+  final ByteData? bytes3 = await data3.toByteData(format: ui.ImageByteFormat.png);
   final Uint8List imageBytes = bytes!.buffer.asUint8List(bytes.offsetInBytes, bytes.lengthInBytes);
+  final Uint8List imageBytes2 = bytes2!.buffer.asUint8List(bytes2.offsetInBytes, bytes2.lengthInBytes);
+  final Uint8List imageBytes3 = bytes3!.buffer.asUint8List(bytes3.offsetInBytes, bytes3.lengthInBytes);
   imgGraph=imageBytes;
-  print(imgGraph);
+  imgGraph2=imageBytes2;
+  imgGraph3=imageBytes3;
   return imageBytes;
 }
 
@@ -137,10 +152,20 @@ String? onTime;
 
   List<AttendanceChartData1> graphData = [];
 
+  final List<ChartDataProgress> chartDataProgress = [
+            ChartDataProgress('Namaz Break', 25),
+            ChartDataProgress('Call Break', 38),
+            ChartDataProgress('Lunch Break', 34),
+            ChartDataProgress('Casual Break', 52),
+            ChartDataProgress('Summit Break', 200)
+        ];
+
 List<Timings> attendanceDataPdf = [];
 
   Widget build(BuildContext context) {
 _cartesianChartKey = GlobalKey();
+_cartesianChartKeyRadial = GlobalKey();
+_cartesianChartKeyColumn = GlobalKey();
     final size = MediaQuery.of(context).size;
      final Provider11 = Provider.of<Provider1>(context, listen: true);
 
@@ -186,7 +211,21 @@ if (snapshot.exists) {
       }
     });
     print("${uidData} data is herere");
-
+    DateTime parseDate(String dateStr) {
+    final parts = dateStr.split('-');
+    if (parts.length == 3) {
+      final day = int.parse(parts[0]);
+      final month = int.parse(parts[1]);
+      final year = int.parse(parts[2]);
+      return DateTime(year, month, day);
+    }
+    return DateTime(0); // Return a default value for invalid dates.
+  }
+ graphData.sort((a, b) {
+      final aDate = parseDate(a.x);
+      final bDate = parseDate(b.x);
+      return aDate.compareTo(bDate);
+    });
     final Map<String, dynamic> finalData = Provider11.sorting(uidData);
     for (var i = 0; i < finalData.length; i++) {
       print("${finalData.keys.toList()[i]} ---> ${i}");
@@ -285,390 +324,422 @@ if (snapshot.exists) {
 return attenData;
 }
 
-    return ListView(
-      scrollDirection: Axis.vertical,
-      primary: true,
-      children: [
-        Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    return Padding(
+      padding:EdgeInsets.symmetric(horizontal: 20),
+      child: ListView(
+        scrollDirection: Axis.vertical,
+        primary: true,
+        children: [
+          Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Row(
+                                   crossAxisAlignment: CrossAxisAlignment.start,
+                                                          mainAxisAlignment: MainAxisAlignment.start,
+                                  children: [
+                                    InkWell(
+                                      onTap: (){
+                                        Provider11.changeTimeTrackTab(0);
+                                      },
+                                      child: Row(
+                                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                                            mainAxisAlignment: MainAxisAlignment.start,
+                                                            children: [
+                                                              Image.network("https://cdn-icons-png.flaticon.com/128/25/25617.png",height: 14,width: 14,color:Provider11.activeTabTimeTracked==0?Colors.white: Color(0xff8F95A2),),
+                                                              SizedBox(width: 5,),
+                                                              Multi(color: Provider11.activeTabTimeTracked==0?Colors.white:Color(0xff8F95A2), subtitle: "Table View", weight: FontWeight.w500, size: 3)
+                                                            ],
+                                                           ),
+                                    ),
+                                    SizedBox(width: 15,),
+                                    
+                                   
+                                  ],
+                                ),
+                                 Row(
+                                   children: [
+        
+        
+        
+        
+                                    FutureBuilder(
+                                
+                                        future: Provider11.fetchAttendanceMonths(),
+                                        initialData: "Code sample",
+                                        builder: (BuildContext context, snapshot) {
+                                          if (snapshot.connectionState == ConnectionState.waiting) {
+                                            return const Center(
+                                              child: CircularProgressIndicator(
+                                                color: Colors.deepPurpleAccent,
+                                              ),
+                                            );
+                                          }
+                                          if (snapshot.connectionState == ConnectionState.done) {
+                                            if (snapshot.hasError) {
+                                              return Center(
+                                                child: Text(
+                                                  'An ${snapshot.error} occurred',
+                                                  style: const TextStyle(fontSize: 18, color: Colors.red),
+                                                ),
+                                              );
+                                            } else if (snapshot.hasData) {
+                                              final data = snapshot.data;
+                                           List<DropdownMenuItem<String>> dropdownItems = data.map<DropdownMenuItem<String>>((month) {
+        return DropdownMenuItem<String>(
+        value: month,
+        child: Text(
+        month,
+        style: TextStyle(color: Colors.white),
+        ),
+        );
+        }).toList();
+                                              print("${data} data is here");
+                                              return  
+        Container(
+                                width: 230,
+                                child: DropdownButton(
+                                  isExpanded: true,
+                                  dropdownColor: Colors.black,
+                                  icon: null,
+                                  iconEnabledColor: Colors.white,
+                                  hint: Multi(
+                                      color: Colors.white,
+                                      subtitle: "",
+                                      weight: FontWeight.normal,
+                                      size: 3),
+                                  value: _selectedValue,
+                                  onChanged: (value) {
+                                    setState(() {
+                                      attendanceDataPdf = [];
+                                      _selectedValue = value!;      
+                                    });
+                                    print(_selectedValue);
+                                  },
+                                  items:dropdownItems,
+                                ),
+                              );
+        
+        
+                                      
+                                            }
+                                          }
+                              
+                                          return const Center(
+                                            child: CircularProgressIndicator(),
+                                          );
+                                        },
+                                    
+                              ),
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+                                  
+                                     GestureDetector(
+                                      onTap: () async{
+                                      
+                                       try {
+                                        Provider11.enablingLoader();
+                                           await _renderChartAsImage();
+                                      //  attendanceDataPdf,imgGraph
+                                       await PdfService().printCustomersPdf(attendanceDataPdf,imgGraph,imgGraph2,imgGraph3,(attendanceDataPdf.length*9).toString() , totalTime, "1", "2", totalEarly, totalTime, totalLate);
+                                       Provider11.disablingLoader();
+                                       } catch (e) {
+                                         Provider11.disablingLoader();
+                                       }
+                                      },
+                                      child: Image.network("https://cdn-icons-png.flaticon.com/128/5261/5261933.png",height: 20,width: 20,color:Colors.white,)),
+                                   ],
+                                 )
+                              ],
+                            ),
+                           
+                          SizedBox(height: 10,),
+    
+          FutureBuilder(
+                                
+                                        future: fetchFireBaseData(),
+                                        initialData: "Code sample",
+                                        builder: (BuildContext context, snapshot) {
+                                          if (snapshot.connectionState == ConnectionState.waiting) {
+                                            return const Center(
+                                              child: CircularProgressIndicator(
+                                                color: Colors.deepPurpleAccent,
+                                              ),
+                                            );
+                                          }
+                                          if (snapshot.connectionState == ConnectionState.done) {
+                                            if (snapshot.hasError) {
+                                              return Center(
+                                                child: Text(
+                                                  'An ${snapshot.error} occurred',
+                                                  style: const TextStyle(fontSize: 18, color: Colors.red),
+                                                ),
+                                              );
+                                            } else if (snapshot.hasData) {
+                                            
+                                              return ListView(
+                                                shrinkWrap: true,
+                                                primary: true,
+                                                scrollDirection: Axis.vertical,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Container(
+                    
+                    height: 300,
+                    child: Padding(
+                      padding:EdgeInsets.symmetric(horizontal: 20,vertical: 20),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Multi(color: Colors.white, subtitle: "Cummulative Stats", weight: FontWeight.bold, size: 3.5),
+                          SizedBox(height: 20,),
+                          Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Row(
-                                 crossAxisAlignment: CrossAxisAlignment.start,
-                                                        mainAxisAlignment: MainAxisAlignment.start,
                                 children: [
-                                  InkWell(
-                                    onTap: (){
-                                      Provider11.changeTimeTrackTab(0);
-                                    },
-                                    child: Row(
-                                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                                          mainAxisAlignment: MainAxisAlignment.start,
-                                                          children: [
-                                                            Image.network("https://cdn-icons-png.flaticon.com/128/25/25617.png",height: 14,width: 14,color:Provider11.activeTabTimeTracked==0?Colors.white: Color(0xff8F95A2),),
-                                                            SizedBox(width: 5,),
-                                                            Multi(color: Provider11.activeTabTimeTracked==0?Colors.white:Color(0xff8F95A2), subtitle: "Table View", weight: FontWeight.w500, size: 3)
-                                                          ],
-                                                         ),
-                                  ),
-                                  SizedBox(width: 15,),
-                                  
-                                 
+                                ReportCards(imgAddress: 'assets/images/totalHours.png', value: '$totalTime', heading: 'Total Working Hours', subHeading: 'hours',),
+                                SizedBox(width: 10,),
+                                ReportCards(imgAddress: 'assets/images/in.png', value: '$totalLate', heading: 'Total Late Arrivals', subHeading: 'arrivals',),
+                                SizedBox(width: 10,),
+                                ReportCards(imgAddress: 'assets/images/in.png', value: '$onTime', heading: 'On Times', subHeading: 'arrivals',),
                                 ],
                               ),
-                               Row(
-                                 children: [
-      
-      
-      
-      
-                                  FutureBuilder(
-                              
-                                      future: Provider11.fetchAttendanceMonths(),
-                                      initialData: "Code sample",
-                                      builder: (BuildContext context, snapshot) {
-                                        if (snapshot.connectionState == ConnectionState.waiting) {
-                                          return const Center(
-                                            child: CircularProgressIndicator(
-                                              color: Colors.deepPurpleAccent,
-                                            ),
-                                          );
-                                        }
-                                        if (snapshot.connectionState == ConnectionState.done) {
-                                          if (snapshot.hasError) {
-                                            return Center(
-                                              child: Text(
-                                                'An ${snapshot.error} occurred',
-                                                style: const TextStyle(fontSize: 18, color: Colors.red),
-                                              ),
-                                            );
-                                          } else if (snapshot.hasData) {
-                                            final data = snapshot.data;
-                                         List<DropdownMenuItem<String>> dropdownItems = data.map<DropdownMenuItem<String>>((month) {
-      return DropdownMenuItem<String>(
-      value: month,
-      child: Text(
-      month,
-      style: TextStyle(color: Colors.white),
-      ),
-      );
-      }).toList();
-                                            print("${data} data is here");
-                                            return  
-      Container(
-                              width: 230,
-                              child: DropdownButton(
-                                isExpanded: true,
-                                dropdownColor: Colors.black,
-                                icon: null,
-                                iconEnabledColor: Colors.white,
-                                hint: Multi(
-                                    color: Colors.white,
-                                    subtitle: "",
-                                    weight: FontWeight.normal,
-                                    size: 3),
-                                value: _selectedValue,
-                                onChanged: (value) {
-                                  setState(() {
-                                    attendanceDataPdf = [];
-                                    _selectedValue = value!;      
-                                  });
-                                  print(_selectedValue);
-                                },
-                                items:dropdownItems,
-                              ),
-                            );
-      
-      
-                                    
-                                          }
-                                        }
-                            
-                                        return const Center(
-                                          child: CircularProgressIndicator(),
-                                        );
-                                      },
-                                  
-                            ),
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-                                
-                                   GestureDetector(
-                                    onTap: () async{
-                                     await _renderChartAsImage();
-                                    //  attendanceDataPdf,imgGraph
-                                      PdfService().printCustomersPdf(attendanceDataPdf,imgGraph,(attendanceDataPdf.length*9).toString() , totalTime, "1", "2", totalEarly, totalTime, totalLate);
-                                    },
-                                    child: Image.network("https://cdn-icons-png.flaticon.com/128/5261/5261933.png",height: 20,width: 20,color:Colors.white,)),
-                                 ],
-                               )
+                              SizedBox(height: 10,),
+                              Row(
+                                children: [
+                                ReportCards(imgAddress: 'assets/images/in.png', value: '$totalEarly', heading: 'Total Early Arrivals', subHeading: 'arrivals',),
+                                SizedBox(width: 10,),
+                                ReportCards(imgAddress: 'assets/images/off.png', value: '00', heading: 'Total Offs', subHeading: 'days',),
+                                SizedBox(width: 10,),
+                                ReportCards(imgAddress: 'assets/images/leave.png', value: '00', heading: 'Total Leaves', subHeading: 'days',),
+                                ],
+                              )
+                               
                             ],
                           ),
-                         
-                        SizedBox(height: 10,),
-
-        FutureBuilder(
-                              
-                                      future: fetchFireBaseData(),
-                                      initialData: "Code sample",
-                                      builder: (BuildContext context, snapshot) {
-                                        if (snapshot.connectionState == ConnectionState.waiting) {
-                                          return const Center(
-                                            child: CircularProgressIndicator(
-                                              color: Colors.deepPurpleAccent,
-                                            ),
-                                          );
-                                        }
-                                        if (snapshot.connectionState == ConnectionState.done) {
-                                          if (snapshot.hasError) {
-                                            return Center(
-                                              child: Text(
-                                                'An ${snapshot.error} occurred',
-                                                style: const TextStyle(fontSize: 18, color: Colors.red),
-                                              ),
-                                            );
-                                          } else if (snapshot.hasData) {
-                                          
-                                            return ListView(
-                                              shrinkWrap: true,
-                                              primary: true,
-                                              scrollDirection: Axis.vertical,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Container(
-                     decoration: BoxDecoration(
-              color: Color(0xff1F2123), borderRadius: BorderRadius.circular(10)),
-                  height: 400,
-                  child: Padding(
-                    padding:EdgeInsets.symmetric(horizontal: 20,vertical: 20),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Multi(color: Colors.white, subtitle: "Cummulative Stats", weight: FontWeight.bold, size: 3.5),
-                        SizedBox(height: 20,),
-                        Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Row(
-                              children: [
-                              ReportCards(imgAddress: 'assets/images/totalHours.png', value: '$totalTime', heading: 'Total Working Hours', subHeading: 'hours',),
-                              SizedBox(width: 10,),
-                              ReportCards(imgAddress: 'assets/images/in.png', value: '$totalLate', heading: 'Total Late Arrivals', subHeading: 'arrivals',),
-                              SizedBox(width: 10,),
-                              ReportCards(imgAddress: 'assets/images/in.png', value: '$onTime', heading: 'On Times', subHeading: 'arrivals',),
-                              ],
-                            ),
-                            SizedBox(height: 10,),
-                            Row(
-                              children: [
-                              ReportCards(imgAddress: 'assets/images/in.png', value: '$totalEarly', heading: 'Total Early Arrivals', subHeading: 'arrivals',),
-                              SizedBox(width: 10,),
-                              ReportCards(imgAddress: 'assets/images/off.png', value: '00', heading: 'Total Offs', subHeading: 'days',),
-                              SizedBox(width: 10,),
-                              ReportCards(imgAddress: 'assets/images/leave.png', value: '00', heading: 'Total Leaves', subHeading: 'days',),
-                              ],
-                            )
-                             
-                          ],
-                        ),
-                      ],
-                    ),
-                  )
-                ),
-                SizedBox(height: 30,),
-                Container(
-                  height: 400,
-                  width:size.width/3.5,
-                  child:Container(
-                decoration: BoxDecoration(
-              color: Color(0xff1F2123), borderRadius: BorderRadius.circular(10)),
-                 child: Column(
-                   children: [
-          SizedBox(height: 20,),
-          Padding(
-            padding:EdgeInsets.symmetric(horizontal: 20),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-          
-          
-                Multi(color: Colors.white, subtitle: "Arrival Graph", weight: FontWeight.bold, size: 3.5),
-          
-          
-          
-          
-              
-              ],
-            ),
-          ),
-  SizedBox(height: 20,),
-            //          SfCartesianChart(
-            //            key: _cartesianChartKey,
-            //              primaryXAxis: CategoryAxis(
-            //                   //Hide the gridlines of x-axis 
-            //                   title: AxisTitle(
-            //                     text: "Dates",
-            //                     textStyle: TextStyle(
-            //                       color: Colors.white
-            //                     )
-            //                   ),
-            //  majorGridLines: MajorGridLines(width: 0), 
-            //  //Hide the axis line of x-axis 
-            //  axisLine: AxisLine(width: 0), 
-            //              ),
-            //               primaryYAxis: NumericAxis(
-            //                   //Hide the gridlines of x-axis 
-            //                   title: AxisTitle(
-            //                     text: "Minutes",
-            //                     textStyle: TextStyle(
-            //                       color: Colors.white
-            //                     )
-            //                   ),
-            //  majorGridLines: MajorGridLines(width: 0), 
-            //  //Hide the axis line of x-axis 
-            //  axisLine: AxisLine(width: 0), 
-            //              ),
-            //              series: <ChartSeries>[
-                           
-            //                  ColumnSeries<AttendanceChartData1, String>(
-            //                     markerSettings: MarkerSettings(
-            //                       color: Colors.amber,
-            //                      isVisible: true
-            //                     ),
-            //                     color: Colors.amber,
-            //                      dataSource: graphData,
-            //                      xValueMapper: (AttendanceChartData1 data, _) => data.x,
-            //                      yValueMapper: (AttendanceChartData1 data, _) => data.early
-            //                  ),
-            //                  ColumnSeries<AttendanceChartData1, String>(
-            //                    markerSettings: MarkerSettings(
-            //                     color: Colors.red,
-            //                      isVisible: true
-            //                     ),
-            //                      color: Colors.red,
-            //                      dataSource: graphData,
-            //                      xValueMapper: (AttendanceChartData1 data, _) => data.x,
-            //                      yValueMapper: (AttendanceChartData1 data, _) => data.late
-            //                  ),
-            //                   ColumnSeries<AttendanceChartData1, String>(
-            //                    markerSettings: MarkerSettings(
-            //                     color: Colors.green,
-            //                      isVisible: true
-            //                     ),
-            //                     color: Colors.green,
-            //                      dataSource: graphData,
-            //                      xValueMapper: (AttendanceChartData1 data, _) => data.x,
-            //                      yValueMapper: (AttendanceChartData1 data, _) => data.late15
-            //                  ),
-                           
-            //              ]
-            //          ),
-
-            SfCircularChart(
-              key: _cartesianChartKey,
-              legend: Legend(
-                    isVisible: true,
-                    
-                  ),
-                        series: <CircularSeries>[
-                           
-                            DoughnutSeries<DougnutChartData, String>(
-                                dataSource: categoryChart,
-                                pointColorMapper:(DougnutChartData data,  _) => data.color,
-                                xValueMapper: (DougnutChartData data, _) => data.x,
-                                yValueMapper: (DougnutChartData data, _) => data.y
-                            )
-                        ]
+                        ],
+                      ),
                     )
-
-           
-                    
-                   ],
-                 )
-             )
                   ),
-              ],
-            ),
-            SizedBox(height: 40,),
-            Padding(
-              padding:EdgeInsets.only(left:20 ),
-              child: Multi(color: Colors.white, subtitle: "Attendence Record", weight: FontWeight.bold, size: 3.5),
-            ),
+                  // SizedBox(height: 30,),
+                  Container(
+                    height: 300,
+                    width:size.width/4,
+                    child:Container(
+                  decoration: BoxDecoration(
+                color: Color(0xff1F2123), borderRadius: BorderRadius.circular(10)),
+                   child: Column(
+                     children: [
             SizedBox(height: 20,),
-            DataTable(
-                                              columnSpacing: 17,
-                                              headingRowHeight: 70,
-                                              columns: [
-                                                
-                                                DataColumn(
-                                                
-                                                  label: Multi(color: Color(0xff8F95A2), subtitle: "S No.", weight: FontWeight.bold, size: 3)
-                                                  ),
-                                                DataColumn(
-                                                  label: Multi(color: Color(0xff8F95A2), subtitle: "Date", weight: FontWeight.bold, size: 3)
-                                                  ),
-                                                DataColumn(
-                                                  label: Multi(color: Color(0xff8F95A2), subtitle: "Actual Check in", weight: FontWeight.bold, size: 3)
-                                                  ),
-                                                  DataColumn(
-                                                  label: Multi(color: Color(0xff8F95A2), subtitle: "Actual Check Out", weight: FontWeight.bold, size: 3)
-                                                  ),
-                                              
-                                                  DataColumn(
-                                                  label: Multi(color: Color(0xff8F95A2), subtitle: "Check in", weight: FontWeight.bold, size: 3)
-                                                  ),
-                                                  DataColumn(
-                                                  label: Multi(color: Color(0xff8F95A2), subtitle: "Check Out", weight: FontWeight.bold, size: 3)
-                                                  ),
-                                                  DataColumn(
-                                                  label: Multi(color: Color(0xff8F95A2), subtitle: "Working Hours", weight: FontWeight.bold, size: 3)
-                                                  ),
-                                                      DataColumn(
-                                                  label: Multi(color: Color(0xff8F95A2), subtitle: "Status", weight: FontWeight.bold, size: 3)
-                                                  ),
-                                                
-                                              ], 
-                                              rows: attendanceDataPdf.map((e)=>DataRow(
-                                                cells: [
-                                                DataCell(Multi(color: Color(0xff8F95A2), subtitle: e.serial.toString(), weight: FontWeight.normal, size: 3)),
-                                                DataCell(Multi(color: Color(0xff8F95A2), subtitle: e.date.toString(), weight: FontWeight.normal, size: 3)),                                               
-                                                DataCell(Multi(color: Color(0xff8F95A2), subtitle: "08:00", weight: FontWeight.normal, size: 3)),
-                                                DataCell(Multi(color: Color(0xff8F95A2), subtitle: "17:00", weight: FontWeight.normal, size: 3)),
-                                                DataCell(Multi(color: Color(0xff8F95A2), subtitle:  e.checkin.toString(), weight: FontWeight.normal, size: 3)),
-                                                DataCell(Multi(color: Color(0xff8F95A2), subtitle: e.checkout.toString(), weight: FontWeight.normal, size: 3)),
-                                                DataCell(Multi(color: Color(0xff8F95A2), subtitle: e.workingHours.toString(), weight: FontWeight.normal, size: 3)),
-                                                DataCell(Multi(color: Color(0xff8F95A2), subtitle:e.status.toString(), weight: FontWeight.normal, size: 3)),
-                                              ])).toList()
-                                              )
-          
-
-            
-          ],
-        );
-                                          }
-                                        }
-                            
-                                        return const Center(
-                                          child: CircularProgressIndicator(),
-                                        );
-                                      },
-                                  
+            Padding(
+              padding:EdgeInsets.symmetric(horizontal: 20),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [   
+                  Multi(color: Colors.white, subtitle: "Arrival Graph", weight: FontWeight.bold, size: 3.5),
+                ],
+              ),
+            ),
+              SizedBox(height: 10,),
+              Container(
+                height: 250,
+                width: size.width/3.6,
+                child: SfCircularChart(
+                
+                  key: _cartesianChartKey,
+                  legend: Legend(
+                        isVisible: true,
+                        textStyle: TextStyle(color: Color(0xff8D939F),fontWeight: FontWeight.bold)
+                      ),
+                            series: <CircularSeries>[
+                               
+                                DoughnutSeries<DougnutChartData, String>(
+                                    dataSource: categoryChart,
+                                    pointColorMapper:(DougnutChartData data,  _) => data.color,
+                                    xValueMapper: (DougnutChartData data, _) => data.x,
+                                    yValueMapper: (DougnutChartData data, _) => data.y
+                                )
+                            ]
+                        ),
+              )
+    
+             
+                      
+                     ],
+                   )
+               )
+                    ),
+                Container(
+      height: 300,
+                    width:size.width/4,
+      
+      child:   Container(
+         decoration: BoxDecoration(
+                color: Color(0xff1F2123), borderRadius: BorderRadius.circular(10)),
+      child: Column(
+        children: [
+           SizedBox(height: 20,),
+            Padding(
+              padding:EdgeInsets.symmetric(horizontal: 20),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [   
+                  Multi(color: Colors.white, subtitle: "Time Utilization", weight: FontWeight.bold, size: 3.5),
+                ],
+              ),
+            ),
+              SizedBox(height: 10,),
+          Container(
+            height: 250,
+            child: SfCircularChart(
+              key: _cartesianChartKeyRadial,
+            legend: Legend(
+                              isVisible: true,
+                               textStyle: TextStyle(color: Color(0xff8D939F),fontWeight: FontWeight.bold)
+                              
                             ),
-      ],
+                                    series: <CircularSeries>[
+            
+                                        // Renders radial bar chart
+            
+                                        RadialBarSeries<ChartDataProgress, String>(
+                                         trackColor: Color(0xff424344),
+                                     cornerStyle: CornerStyle.bothCurve,
+            
+                                            dataSource: chartDataProgress,
+            
+                                            xValueMapper: (ChartDataProgress data, _) => data.x,
+            
+                                            yValueMapper: (ChartDataProgress data, _) => data.y
+            
+                                        )
+            
+                                    ]
+            
+                                ),
+          ),
+        ],
+      ),
+      ),
+    )
+                ],
+              ),
+              SizedBox(height: 40,),
+              Padding(
+                padding:EdgeInsets.only(left:20 ),
+                child: Multi(color: Colors.white, subtitle: "Attendence Record", weight: FontWeight.bold, size: 3.5),
+              ),
+              SizedBox(height: 20,),
+              DataTable(
+                                                columnSpacing: 17,
+                                                headingRowHeight: 70,
+                                                columns: [
+                                                  
+                                                  DataColumn(
+                                                  
+                                                    label: Multi(color: Color(0xff8F95A2), subtitle: "S No.", weight: FontWeight.bold, size: 3)
+                                                    ),
+                                                  DataColumn(
+                                                    label: Multi(color: Color(0xff8F95A2), subtitle: "Date", weight: FontWeight.bold, size: 3)
+                                                    ),
+                                                  DataColumn(
+                                                    label: Multi(color: Color(0xff8F95A2), subtitle: "Actual Check in", weight: FontWeight.bold, size: 3)
+                                                    ),
+                                                    DataColumn(
+                                                    label: Multi(color: Color(0xff8F95A2), subtitle: "Actual Check Out", weight: FontWeight.bold, size: 3)
+                                                    ),
+                                                
+                                                    DataColumn(
+                                                    label: Multi(color: Color(0xff8F95A2), subtitle: "Check in", weight: FontWeight.bold, size: 3)
+                                                    ),
+                                                    DataColumn(
+                                                    label: Multi(color: Color(0xff8F95A2), subtitle: "Check Out", weight: FontWeight.bold, size: 3)
+                                                    ),
+                                                    DataColumn(
+                                                    label: Multi(color: Color(0xff8F95A2), subtitle: "Working Hours", weight: FontWeight.bold, size: 3)
+                                                    ),
+                                                        DataColumn(
+                                                    label: Multi(color: Color(0xff8F95A2), subtitle: "Status", weight: FontWeight.bold, size: 3)
+                                                    ),
+                                                  
+                                                ], 
+                                                rows: attendanceDataPdf.map((e)=>DataRow(
+                                                  cells: [
+                                                  DataCell(Multi(color: Color(0xff8F95A2), subtitle: e.serial.toString(), weight: FontWeight.normal, size: 3)),
+                                                  DataCell(Multi(color: Color(0xff8F95A2), subtitle: e.date.toString(), weight: FontWeight.normal, size: 3)),                                               
+                                                  DataCell(Multi(color: Color(0xff8F95A2), subtitle: "08:00", weight: FontWeight.normal, size: 3)),
+                                                  DataCell(Multi(color: Color(0xff8F95A2), subtitle: "17:00", weight: FontWeight.normal, size: 3)),
+                                                  DataCell(Multi(color: Color(0xff8F95A2), subtitle:  e.checkin.toString(), weight: FontWeight.normal, size: 3)),
+                                                  DataCell(Multi(color: Color(0xff8F95A2), subtitle: e.checkout.toString(), weight: FontWeight.normal, size: 3)),
+                                                  DataCell(Multi(color: Color(0xff8F95A2), subtitle: e.workingHours.toString(), weight: FontWeight.normal, size: 3)),
+                                                  DataCell(Multi(color: Color(0xff8F95A2), subtitle:e.status.toString(), weight: FontWeight.normal, size: 3)),
+                                                ])).toList()
+                                                ),
+      
+            Container(
+              height: 400,
+              child: SfCartesianChart(
+                key: _cartesianChartKeyColumn,
+               
+                primaryXAxis: CategoryAxis(),
+                        series: <ChartSeries>[
+                          
+                            ColumnSeries<AttendanceChartData1, int>(
+                              
+                                name: "Early Arrivals",
+                                dataSource: graphData,
+                                color: Colors.amber,
+                                xValueMapper: (AttendanceChartData1 data, _) => int.parse(data.x.toString()[1]!='-'?data.x.toString().substring(0,2):data.x.toString().substring(0,1)),
+                                yValueMapper: (AttendanceChartData1 data, _) => data.early as int
+                            ),
+                            ColumnSeries<AttendanceChartData1, int>(
+                              //  splineType: SplineType.cardinal,
+                              //   cardinalSplineTension: 2.3,
+                              name: "Late Arrivals",
+                              color: Colors.red,
+                                dataSource: graphData,
+                                xValueMapper: (AttendanceChartData1 data, _) =>  int.parse(data.x.toString()[1]!='-'?data.x.toString().substring(0,2):data.x.toString().substring(0,1)),
+                                yValueMapper: (AttendanceChartData1 data, _) => data.late as int
+                            ),
+                             ColumnSeries<AttendanceChartData1, int>(
+                              name: "Ontime Arrivals",
+                                dataSource: graphData,
+                                color: Colors.green,
+                                xValueMapper: (AttendanceChartData1 data, _) =>  int.parse(data.x.toString()[1]!='-'?data.x.toString().substring(0,2):data.x.toString().substring(0,1)),
+                                yValueMapper: (AttendanceChartData1 data, _) => data.late15 as int
+                            ),
+                        ]
+                    ),
+            )
+              
+            ],
+          );
+                                            }
+                                          }
+                              
+                                          return const Center(
+                                            child: CircularProgressIndicator(),
+                                          );
+                                        },
+                                    
+                              ),
+        ],
+      ),
     );
   }
 }
@@ -812,6 +883,8 @@ class AttendanceChartData1 {
 class PdfService {
   Future<void> printCustomersPdf(List<Timings> data,
   var graphData,
+  var graphData2,
+  var graphData3,
   String? actualTime,
   String? paidTime,
   String? totalOffs,
@@ -880,6 +953,8 @@ document.template.bottom = footer;
  
 
     final PdfPage page = document.pages.add();
+
+final PdfPage page2 = document.pages.add();
 
 
 
@@ -1107,13 +1182,13 @@ document.template.bottom = footer;
 
 
    
-     final PdfBitmap image3 = PdfBitmap(graphData);
-       page.graphics.drawImage(
-           image3,
-      Rect.fromLTWH(
-          300, 50, 250, 180),
+    //  final PdfBitmap image3 = PdfBitmap(graphData);
+    //    page.graphics.drawImage(
+    //        image3,
+    //   Rect.fromLTWH(
+    //       300, 50, 250, 180),
          
-          );
+    //       );
 
 
 
@@ -1132,50 +1207,338 @@ document.template.bottom = footer;
   //         // bounds: Rect.fromLTWH(50, 130, 300, 50)
   // );
 
+    var profileUrl =
+        "https://res.cloudinary.com/diecwxxmm/image/upload/v1697084087/zellesolutions%20portal/nh5ub0ynyfwvi5c9wnac.jpg";
+    var responseProfile = await get(Uri.parse(profileUrl));
+    var profileImgdata = responseProfile.bodyBytes;
 
-
-
-
-
-
-
-
-
-
-
-
-
+    //Create a bitmap object.
+    PdfBitmap profileImage = PdfBitmap(profileImgdata);
+    
+      page.graphics.drawImage(
+        profileImage,
+        Rect.fromLTWH(
+            0, 10, 170, 180));
 
 
 
   
+  // page.graphics.drawRectangle(
 
-   
+  // pen: PdfPen(PdfColor(2, 158, 222)),
+  // brush: PdfSolidBrush(PdfColor(2, 158, 222)),
+  // bounds: Rect.fromPoints(Offset(0, 0), Offset(230, 250)));
+
+
+
+  page.graphics.drawString(
+          'ABDUL SAMI',
+          PdfStandardFont(PdfFontFamily.helvetica, 25,
+              style: PdfFontStyle.bold),
+          brush: PdfSolidBrush(PdfColor(0, 50, 198)),
+          bounds: Rect.fromPoints(Offset(200, 10), Offset(200, 10))
+  );
+ 
+  page.graphics.drawLine(
+    PdfPen(PdfColor(0, 50, 198), width: 1),
+    Offset(200, 40),Offset(340, 40));
+
+
+  page.graphics.drawString(
+          'Designation',
+          PdfStandardFont(PdfFontFamily.helvetica, 12,
+              style: PdfFontStyle.regular),
+          brush: PdfSolidBrush(PdfColor(58, 58, 58)),
+          bounds: Rect.fromPoints(Offset(200, 50), Offset(300, 50))
+  );
+  page.graphics.drawString(
+          'Flutter Developer',
+          PdfStandardFont(PdfFontFamily.helvetica, 12,
+              style: PdfFontStyle.bold),
+          brush: PdfSolidBrush(PdfColor(58, 58, 58)),
+          bounds: Rect.fromPoints(Offset(280, 50), Offset(500, 50))
+  );
+
+
+  page.graphics.drawString(
+          'Employee Id',
+          PdfStandardFont(PdfFontFamily.helvetica, 12,
+              style: PdfFontStyle.regular),
+          brush: PdfSolidBrush(PdfColor(58, 58, 58)),
+          bounds: Rect.fromPoints(Offset(200, 70), Offset(300, 70))
+  );
+  page.graphics.drawString(
+          '10001',
+          PdfStandardFont(PdfFontFamily.helvetica, 12,
+              style: PdfFontStyle.bold),
+          brush: PdfSolidBrush(PdfColor(58, 58, 58)),
+          bounds: Rect.fromPoints(Offset(280, 70), Offset(500, 70))
+  );
+
+
+  page.graphics.drawString(
+          'Shift',
+          PdfStandardFont(PdfFontFamily.helvetica, 12,
+              style: PdfFontStyle.regular),
+          brush: PdfSolidBrush(PdfColor(58, 58, 58)),
+          bounds: Rect.fromPoints(Offset(200, 90), Offset(300, 90))
+  );
+  page.graphics.drawString(
+          'Morning',
+          PdfStandardFont(PdfFontFamily.helvetica, 12,
+              style: PdfFontStyle.bold),
+          brush: PdfSolidBrush(PdfColor(58, 58, 58)),
+          bounds: Rect.fromPoints(Offset(280, 90), Offset(500, 90))
+  );
+
+
+  page.graphics.drawString(
+          'Shift',
+          PdfStandardFont(PdfFontFamily.helvetica, 12,
+              style: PdfFontStyle.regular),
+          brush: PdfSolidBrush(PdfColor(58, 58, 58)),
+          bounds: Rect.fromPoints(Offset(200, 110), Offset(300, 110))
+  );
+  page.graphics.drawString(
+          'Morning',
+          PdfStandardFont(PdfFontFamily.helvetica, 12,
+              style: PdfFontStyle.bold),
+          brush: PdfSolidBrush(PdfColor(58, 58, 58)),
+          bounds: Rect.fromPoints(Offset(280, 110), Offset(500, 110))
+  );
+
+
+
+  page.graphics.drawString(
+          'Email Id',
+          PdfStandardFont(PdfFontFamily.helvetica, 12,
+              style: PdfFontStyle.regular),
+          brush: PdfSolidBrush(PdfColor(58, 58, 58)),
+          bounds: Rect.fromPoints(Offset(200, 130), Offset(300, 130))
+  );
+  page.graphics.drawString(
+          'abdulsami.zellesolutions@gmail.com',
+          PdfStandardFont(PdfFontFamily.helvetica, 12,
+              style: PdfFontStyle.bold),
+          brush:PdfSolidBrush(PdfColor(58, 58, 58)),
+          bounds: Rect.fromPoints(Offset(280, 130), Offset(500, 130))
+  );
+
+
+  page.graphics.drawString(
+          'Email Id',
+          PdfStandardFont(PdfFontFamily.helvetica, 12,
+              style: PdfFontStyle.regular),
+          brush: PdfSolidBrush(PdfColor(58, 58, 58)),
+          bounds: Rect.fromPoints(Offset(200, 150), Offset(300, 150))
+  );
+  page.graphics.drawString(
+          'abdulsami.zellesolutions@gmail.com',
+          PdfStandardFont(PdfFontFamily.helvetica, 12,
+              style: PdfFontStyle.bold),
+          brush: PdfSolidBrush(PdfColor(58, 58, 58)),
+          bounds: Rect.fromPoints(Offset(280, 150), Offset(500, 150))
+  );
+
+
+
+    page.graphics.drawString(
+          'Email Id',
+          PdfStandardFont(PdfFontFamily.helvetica, 12,
+              style: PdfFontStyle.regular),
+          brush:PdfSolidBrush(PdfColor(58, 58, 58)),
+          bounds: Rect.fromPoints(Offset(200, 170), Offset(300, 170))
+  );
+  page.graphics.drawString(
+          'abdulsami.zellesolutions@gmail.com',
+          PdfStandardFont(PdfFontFamily.helvetica, 12,
+              style: PdfFontStyle.bold),
+          brush: PdfSolidBrush(PdfColor(58, 58, 58)),
+          bounds: Rect.fromPoints(Offset(280, 170), Offset(500, 170))
+  );
+  
+
+
+  
+
+
+  page.graphics.drawString(
+          'Cummulative Statistics',
+          PdfStandardFont(PdfFontFamily.helvetica, 14,
+              style: PdfFontStyle.bold),
+          brush: PdfSolidBrush(PdfColor(58, 58, 58)),
+          bounds: Rect.fromPoints(Offset(0, 240), Offset(0, 240))
+  );
+
+    page.graphics.drawLine(
+    PdfPen(PdfColor(58, 58, 58), width: 1),
+    Offset(0, 260),Offset(140, 260));
+
+
+
+
+
+
+
+
+
+
     final PdfGraphics graphics = page.graphics;
 
+    graphics.drawRectangle(
+  
+    pen: PdfPen(PdfColor(2, 158, 222)),
+    brush: PdfSolidBrush(PdfColor(2, 158, 222)),
+    bounds: Rect.fromPoints(Offset(0, 270), Offset(110, 310)));
+
+    graphics.drawString(
+              'Actual Working Hours',
+              PdfStandardFont(PdfFontFamily.helvetica, 8,
+                  style: PdfFontStyle.bold),
+              brush: PdfBrushes.white,
+              bounds: Rect.fromPoints(Offset(10, 280), Offset(10, 280)),
+               format: PdfStringFormat(
+            alignment: PdfTextAlignment.left, lineAlignment: PdfVerticalAlignment.middle)
+              // bounds: Rect.fromLTWH(50, 130, 300, 50)
+      );
+     graphics.drawString(
+              '260 hours',
+              PdfStandardFont(PdfFontFamily.helvetica, 12,
+                  style: PdfFontStyle.bold),
+              brush: PdfBrushes.white,
+              bounds: Rect.fromPoints(Offset(10, 295), Offset(10, 295)),
+               format: PdfStringFormat(
+            alignment: PdfTextAlignment.left, lineAlignment: PdfVerticalAlignment.middle)
+              // bounds: Rect.fromLTWH(50, 130, 300, 50)
+      );
+
+
+
+  
+
+    graphics.drawRectangle(
+  
+    pen: PdfPen(PdfColor(2, 158, 222)),
+    brush: PdfSolidBrush(PdfColor(2, 158, 222)),
+    bounds: Rect.fromPoints(Offset(120, 270), Offset(230, 310)));
+
+    graphics.drawString(
+              'Paid Working Hours',
+              PdfStandardFont(PdfFontFamily.helvetica, 8,
+                  style: PdfFontStyle.bold),
+              brush: PdfBrushes.white,
+              bounds: Rect.fromPoints(Offset(130, 280), Offset(130, 280)),
+               format: PdfStringFormat(
+            alignment: PdfTextAlignment.left, lineAlignment: PdfVerticalAlignment.middle)
+              // bounds: Rect.fromLTWH(50, 130, 300, 50)
+      );
+    graphics.drawString(
+              '290 hours',
+              PdfStandardFont(PdfFontFamily.helvetica, 12,
+                  style: PdfFontStyle.bold),
+              brush: PdfBrushes.white,
+              bounds: Rect.fromPoints(Offset(130, 295), Offset(130, 295)),
+               format: PdfStringFormat(
+            alignment: PdfTextAlignment.left, lineAlignment: PdfVerticalAlignment.middle)
+              // bounds: Rect.fromLTWH(50, 130, 300, 50)
+      );
+
+
+
+
+
+    graphics.drawRectangle(
+  
+    pen: PdfPen(PdfColor(2, 158, 222)),
+    brush: PdfSolidBrush(PdfColor(2, 158, 222)),
+    bounds: Rect.fromPoints(Offset(0, 320), Offset(110, 360)));
+
+    graphics.drawString(
+              'Total Early Arrivals',
+              PdfStandardFont(PdfFontFamily.helvetica, 8,
+                  style: PdfFontStyle.bold),
+              brush: PdfBrushes.white,
+              bounds: Rect.fromPoints(Offset(10, 330), Offset(10, 330)),
+               format: PdfStringFormat(
+            alignment: PdfTextAlignment.left, lineAlignment: PdfVerticalAlignment.middle)
+              // bounds: Rect.fromLTWH(50, 130, 300, 50)
+      );
+    graphics.drawString(
+              '10 Arrivals',
+              PdfStandardFont(PdfFontFamily.helvetica, 12,
+                  style: PdfFontStyle.bold),
+              brush: PdfBrushes.white,
+              bounds: Rect.fromPoints(Offset(10, 345), Offset(10, 345)),
+               format: PdfStringFormat(
+            alignment: PdfTextAlignment.left, lineAlignment: PdfVerticalAlignment.middle)
+              // bounds: Rect.fromLTWH(50, 130, 300, 50)
+      );
+
+
+
+
+
+  
+
+    graphics.drawRectangle(
+  
+    pen: PdfPen(PdfColor(2, 158, 222)),
+    brush: PdfSolidBrush(PdfColor(2, 158, 222)),
+    bounds: Rect.fromPoints(Offset(120, 320), Offset(230, 360)));
+
+
+    graphics.drawString(
+              'Total Late Arrivals',
+              PdfStandardFont(PdfFontFamily.helvetica, 8,
+                  style: PdfFontStyle.bold),
+              brush: PdfBrushes.white,
+              bounds: Rect.fromPoints(Offset(130, 330), Offset(130, 330)),
+               format: PdfStringFormat(
+            alignment: PdfTextAlignment.left, lineAlignment: PdfVerticalAlignment.middle)
+              // bounds: Rect.fromLTWH(50, 130, 300, 50)
+      );
+    graphics.drawString(
+              '2 Arrivals',
+              PdfStandardFont(PdfFontFamily.helvetica, 12,
+                  style: PdfFontStyle.bold),
+              brush: PdfBrushes.white,
+              bounds: Rect.fromPoints(Offset(130, 345), Offset(130, 345)),
+               format: PdfStringFormat(
+            alignment: PdfTextAlignment.left, lineAlignment: PdfVerticalAlignment.middle)
+              // bounds: Rect.fromLTWH(50, 130, 300, 50)
+      );
+
+
+
+
+
+
+
+
+    
     
     graphics.drawRectangle(
-      
-        pen: PdfPen(PdfColor(2, 158, 222)),
-        brush: PdfSolidBrush(PdfColor(2, 158, 222)),
-        bounds: Rect.fromPoints(Offset(0, 10), Offset(190, 50)));
+  
+    pen: PdfPen(PdfColor(2, 158, 222)),
+    brush: PdfSolidBrush(PdfColor(2, 158, 222)),
+    bounds: Rect.fromPoints(Offset(0, 370), Offset(110, 410)));
 
     graphics.drawString(
-              'Employee Name',
+              'Total Offs',
               PdfStandardFont(PdfFontFamily.helvetica, 8,
                   style: PdfFontStyle.bold),
               brush: PdfBrushes.white,
-              bounds: Rect.fromPoints(Offset(10, 10), Offset(190, 35)),
+              bounds: Rect.fromPoints(Offset(10, 370), Offset(10, 390)),
                format: PdfStringFormat(
             alignment: PdfTextAlignment.left, lineAlignment: PdfVerticalAlignment.middle)
               // bounds: Rect.fromLTWH(50, 130, 300, 50)
       );
-     graphics.drawString(
-              'Abdul Sami',
-              PdfStandardFont(PdfFontFamily.helvetica, 13,
+    graphics.drawString(
+              '2 off',
+              PdfStandardFont(PdfFontFamily.helvetica, 12,
                   style: PdfFontStyle.bold),
               brush: PdfBrushes.white,
-              bounds: Rect.fromPoints(Offset(10, 15), Offset(190, 55)),
+              bounds: Rect.fromPoints(Offset(10, 395), Offset(130, 395)),
                format: PdfStringFormat(
             alignment: PdfTextAlignment.left, lineAlignment: PdfVerticalAlignment.middle)
               // bounds: Rect.fromLTWH(50, 130, 300, 50)
@@ -1183,138 +1546,138 @@ document.template.bottom = footer;
 
 
 
-
-
-
-
-
-
+  
 
     graphics.drawRectangle(
-      
-        pen: PdfPen(PdfColor(2, 158, 222)),
-        brush: PdfSolidBrush(PdfColor(2, 158, 222)),
-        bounds: Rect.fromPoints(Offset(200, 10), Offset(390, 50)));
+  
+    pen: PdfPen(PdfColor(2, 158, 222)),
+    brush: PdfSolidBrush(PdfColor(2, 158, 222)),
+    bounds: Rect.fromPoints(Offset(120, 370), Offset(230, 410)));
 
-    graphics.drawString(
-              'Employee Id',
+        graphics.drawString(
+              'Total Leaves',
               PdfStandardFont(PdfFontFamily.helvetica, 8,
                   style: PdfFontStyle.bold),
               brush: PdfBrushes.white,
-              bounds: Rect.fromPoints(Offset(210, 10), Offset(390, 35)),
+              bounds: Rect.fromPoints(Offset(130, 370), Offset(130, 390)),
                format: PdfStringFormat(
             alignment: PdfTextAlignment.left, lineAlignment: PdfVerticalAlignment.middle)
               // bounds: Rect.fromLTWH(50, 130, 300, 50)
       );
-     graphics.drawString(
-              'ZELLE-123',
-              PdfStandardFont(PdfFontFamily.helvetica, 13,
-                  style: PdfFontStyle.bold),
-              brush: PdfBrushes.white,
-              bounds: Rect.fromPoints(Offset(210, 15), Offset(390, 55)),
-               format: PdfStringFormat(
-            alignment: PdfTextAlignment.left, lineAlignment: PdfVerticalAlignment.middle)
-              // bounds: Rect.fromLTWH(50, 130, 300, 50)
-      );
-
-      
-
-
-
-    graphics.drawRectangle(
-      
-        pen: PdfPen(PdfColor(2, 158, 222)),
-        brush: PdfSolidBrush(PdfColor(2, 158, 222)),
-        bounds: Rect.fromPoints(Offset(400, 10), Offset(590, 50)));
-
     graphics.drawString(
-              'Employee Designation',
-              PdfStandardFont(PdfFontFamily.helvetica, 8,
+              '2 leaves',
+              PdfStandardFont(PdfFontFamily.helvetica, 12,
                   style: PdfFontStyle.bold),
               brush: PdfBrushes.white,
-              bounds: Rect.fromPoints(Offset(410, 10), Offset(590, 35)),
-               format: PdfStringFormat(
-            alignment: PdfTextAlignment.left, lineAlignment: PdfVerticalAlignment.middle)
-              // bounds: Rect.fromLTWH(50, 130, 300, 50)
-      );
-     graphics.drawString(
-              'Flutter Developer',
-              PdfStandardFont(PdfFontFamily.helvetica, 13,
-                  style: PdfFontStyle.bold),
-              brush: PdfBrushes.white,
-              bounds: Rect.fromPoints(Offset(410, 15), Offset(590, 55)),
+              bounds: Rect.fromPoints(Offset(130, 395), Offset(130, 395)),
                format: PdfStringFormat(
             alignment: PdfTextAlignment.left, lineAlignment: PdfVerticalAlignment.middle)
               // bounds: Rect.fromLTWH(50, 130, 300, 50)
       );
 
+
+
+
+    
+
+
+    final PdfBitmap image3 = PdfBitmap(graphData);
+      page.graphics.drawImage(image3,
+      Rect.fromLTWH(
+          250, 240, 300, 200),     
+    );
+
+
+
+            final PdfBitmap image5 = PdfBitmap(graphData3);
+      page.graphics.drawImage(image5,
+      Rect.fromLTWH(
+          0, 445, 285, 180),     
+    );
+
+
+
+    final PdfBitmap image4 = PdfBitmap(graphData2);
+      page.graphics.drawImage(image4,
+      Rect.fromLTWH(
+          280, 445, 270, 180),     
+    );
+
+
+
+
+
+    // graphics.drawRectangle(
       
-
-
-
-
-
-
-    graphics.drawRectangle(
-      
-        pen: PdfPen(PdfColor(2, 158, 222)),
-        brush: PdfSolidBrush(PdfColor(2, 158, 222)),
-        bounds: Rect.fromPoints(Offset(0, 60), Offset(90, 120)));
+    //     pen: PdfPen(PdfColor(2, 158, 222)),
+    //     brush: PdfSolidBrush(PdfColor(2, 158, 222)),
+    //     bounds: Rect.fromPoints(Offset(100, 60), Offset(190, 120)));
   
 
 
-    graphics.drawString(
-              'Actual Hours',
-              PdfStandardFont(PdfFontFamily.helvetica, 8,
-                  style: PdfFontStyle.bold),
-              brush: PdfBrushes.white,
-              bounds: Rect.fromPoints(Offset(10, 65), Offset(80, 105)),
-               format: PdfStringFormat(
-            alignment: PdfTextAlignment.left, lineAlignment: PdfVerticalAlignment.top)
-              // bounds: Rect.fromLTWH(50, 130, 300, 50)
-      );
-    graphics.drawString(
-              '100 hrs',
-              PdfStandardFont(PdfFontFamily.helvetica, 20,
-                  style: PdfFontStyle.bold),
-              brush: PdfBrushes.white,
-              bounds: Rect.fromPoints(Offset(10, 75), Offset(80, 110)),
-               format: PdfStringFormat(
-            alignment: PdfTextAlignment.left, lineAlignment: PdfVerticalAlignment.middle)
-              // bounds: Rect.fromLTWH(50, 130, 300, 50)
-      );
+    // graphics.drawString(
+    //           'Actual Hours',
+    //           PdfStandardFont(PdfFontFamily.helvetica, 8,
+    //               style: PdfFontStyle.bold),
+    //           brush: PdfBrushes.white,
+    //           bounds: Rect.fromPoints(Offset(110, 65), Offset(180, 105)),
+    //            format: PdfStringFormat(
+    //         alignment: PdfTextAlignment.left, lineAlignment: PdfVerticalAlignment.top)
+    //           // bounds: Rect.fromLTWH(50, 130, 300, 50)
+    //   );
+    // graphics.drawString(
+    //           '100 hrs',
+    //           PdfStandardFont(PdfFontFamily.helvetica, 20,
+    //               style: PdfFontStyle.bold),
+    //           brush: PdfBrushes.white,
+    //           bounds: Rect.fromPoints(Offset(110, 75), Offset(180, 110)),
+    //            format: PdfStringFormat(
+    //         alignment: PdfTextAlignment.left, lineAlignment: PdfVerticalAlignment.middle)
+    //           // bounds: Rect.fromLTWH(50, 130, 300, 50)
+    //   );
 
 
 
 
-    graphics.drawRectangle(
+
+
+
+
+
+
+
+
+
+
+
+    // graphics.drawRectangle(
       
-        pen: PdfPen(PdfColor(2, 158, 222)),
-        brush: PdfSolidBrush(PdfColor(2, 158, 222)),
-        bounds: Rect.fromPoints(Offset(100, 60), Offset(190, 120)));
+    //     pen: PdfPen(PdfColor(2, 158, 222)),
+    //     brush: PdfSolidBrush(PdfColor(2, 158, 222)),
+    //     bounds: Rect.fromPoints(Offset(0, 130), Offset(90, 190)));
   
 
 
-    graphics.drawString(
-              'Actual Hours',
-              PdfStandardFont(PdfFontFamily.helvetica, 8,
-                  style: PdfFontStyle.bold),
-              brush: PdfBrushes.white,
-              bounds: Rect.fromPoints(Offset(110, 65), Offset(180, 105)),
-               format: PdfStringFormat(
-            alignment: PdfTextAlignment.left, lineAlignment: PdfVerticalAlignment.top)
-              // bounds: Rect.fromLTWH(50, 130, 300, 50)
-      );
-    graphics.drawString(
-              '100 hrs',
-              PdfStandardFont(PdfFontFamily.helvetica, 20,
-                  style: PdfFontStyle.bold),
-              brush: PdfBrushes.white,
-              bounds: Rect.fromPoints(Offset(110, 75), Offset(180, 110)),
-               format: PdfStringFormat(
-            alignment: PdfTextAlignment.left, lineAlignment: PdfVerticalAlignment.middle)
-              // bounds: Rect.fromLTWH(50, 130, 300, 50)
-      );
+    // graphics.drawString(
+    //           'Actual Hours',
+    //           PdfStandardFont(PdfFontFamily.helvetica, 8,
+    //               style: PdfFontStyle.bold),
+    //           brush: PdfBrushes.white,
+    //           bounds: Rect.fromPoints(Offset(10, 135), Offset(80, 175)),
+    //            format: PdfStringFormat(
+    //         alignment: PdfTextAlignment.left, lineAlignment: PdfVerticalAlignment.top)
+    //           // bounds: Rect.fromLTWH(50, 130, 300, 50)
+    //   );
+    // graphics.drawString(
+    //           '100 hrs',
+    //           PdfStandardFont(PdfFontFamily.helvetica, 20,
+    //               style: PdfFontStyle.bold),
+    //           brush: PdfBrushes.white,
+    //           bounds: Rect.fromPoints(Offset(10, 155), Offset(80, 180)),
+    //            format: PdfStringFormat(
+    //         alignment: PdfTextAlignment.left, lineAlignment: PdfVerticalAlignment.middle)
+    //           // bounds: Rect.fromLTWH(50, 130, 300, 50)
+    //   );
 
 
 
@@ -1330,34 +1693,37 @@ document.template.bottom = footer;
 
 
 
-    graphics.drawRectangle(
+
+
+
+        //   graphics.drawRectangle(
       
-        pen: PdfPen(PdfColor(2, 158, 222)),
-        brush: PdfSolidBrush(PdfColor(2, 158, 222)),
-        bounds: Rect.fromPoints(Offset(0, 130), Offset(90, 190)));
+        // pen: PdfPen(PdfColor(2, 158, 222)),
+        // brush: PdfSolidBrush(PdfColor(2, 158, 222)),
+        // bounds: Rect.fromPoints(Offset(100, 130), Offset(190, 190)));
   
 
 
-    graphics.drawString(
-              'Actual Hours',
-              PdfStandardFont(PdfFontFamily.helvetica, 8,
-                  style: PdfFontStyle.bold),
-              brush: PdfBrushes.white,
-              bounds: Rect.fromPoints(Offset(10, 135), Offset(80, 175)),
-               format: PdfStringFormat(
-            alignment: PdfTextAlignment.left, lineAlignment: PdfVerticalAlignment.top)
-              // bounds: Rect.fromLTWH(50, 130, 300, 50)
-      );
-    graphics.drawString(
-              '100 hrs',
-              PdfStandardFont(PdfFontFamily.helvetica, 20,
-                  style: PdfFontStyle.bold),
-              brush: PdfBrushes.white,
-              bounds: Rect.fromPoints(Offset(10, 155), Offset(80, 180)),
-               format: PdfStringFormat(
-            alignment: PdfTextAlignment.left, lineAlignment: PdfVerticalAlignment.middle)
-              // bounds: Rect.fromLTWH(50, 130, 300, 50)
-      );
+    // graphics.drawString(
+    //           'Actual Hours',
+    //           PdfStandardFont(PdfFontFamily.helvetica, 8,
+    //               style: PdfFontStyle.bold),
+    //           brush: PdfBrushes.white,
+    //           bounds: Rect.fromPoints(Offset(110, 135), Offset(180, 175)),
+    //            format: PdfStringFormat(
+    //         alignment: PdfTextAlignment.left, lineAlignment: PdfVerticalAlignment.top)
+    //           // bounds: Rect.fromLTWH(50, 130, 300, 50)
+    //   );
+    // graphics.drawString(
+    //           '100 hrs',
+    //           PdfStandardFont(PdfFontFamily.helvetica, 20,
+    //               style: PdfFontStyle.bold),
+    //           brush: PdfBrushes.white,
+    //           bounds: Rect.fromPoints(Offset(110, 155), Offset(180, 180)),
+    //            format: PdfStringFormat(
+    //         alignment: PdfTextAlignment.left, lineAlignment: PdfVerticalAlignment.middle)
+    //           // bounds: Rect.fromLTWH(50, 130, 300, 50)
+    //   );
 
 
 
@@ -1368,113 +1734,67 @@ document.template.bottom = footer;
 
 
 
-
-
-
-
-
-
-
-
-          graphics.drawRectangle(
+    // graphics.drawRectangle(
       
-        pen: PdfPen(PdfColor(2, 158, 222)),
-        brush: PdfSolidBrush(PdfColor(2, 158, 222)),
-        bounds: Rect.fromPoints(Offset(100, 130), Offset(190, 190)));
+    //     pen: PdfPen(PdfColor(2, 158, 222)),
+    //     brush: PdfSolidBrush(PdfColor(2, 158, 222)),
+    //     bounds: Rect.fromPoints(Offset(0, 200), Offset(90, 260)));
   
 
 
-    graphics.drawString(
-              'Actual Hours',
-              PdfStandardFont(PdfFontFamily.helvetica, 8,
-                  style: PdfFontStyle.bold),
-              brush: PdfBrushes.white,
-              bounds: Rect.fromPoints(Offset(110, 135), Offset(180, 175)),
-               format: PdfStringFormat(
-            alignment: PdfTextAlignment.left, lineAlignment: PdfVerticalAlignment.top)
-              // bounds: Rect.fromLTWH(50, 130, 300, 50)
-      );
-    graphics.drawString(
-              '100 hrs',
-              PdfStandardFont(PdfFontFamily.helvetica, 20,
-                  style: PdfFontStyle.bold),
-              brush: PdfBrushes.white,
-              bounds: Rect.fromPoints(Offset(110, 155), Offset(180, 180)),
-               format: PdfStringFormat(
-            alignment: PdfTextAlignment.left, lineAlignment: PdfVerticalAlignment.middle)
-              // bounds: Rect.fromLTWH(50, 130, 300, 50)
-      );
+    // graphics.drawString(
+    //           'Actual Hours',
+    //           PdfStandardFont(PdfFontFamily.helvetica, 8,
+    //               style: PdfFontStyle.bold),
+    //           brush: PdfBrushes.white,
+    //           bounds: Rect.fromPoints(Offset(10, 205), Offset(80, 245)),
+    //            format: PdfStringFormat(
+    //         alignment: PdfTextAlignment.left, lineAlignment: PdfVerticalAlignment.top)
+    //           // bounds: Rect.fromLTWH(50, 130, 300, 50)
+    //   );
+    // graphics.drawString(
+    //           '100 hrs',
+    //           PdfStandardFont(PdfFontFamily.helvetica, 20,
+    //               style: PdfFontStyle.bold),
+    //           brush: PdfBrushes.white,
+    //           bounds: Rect.fromPoints(Offset(10, 215), Offset(80, 250)),
+    //            format: PdfStringFormat(
+    //         alignment: PdfTextAlignment.left, lineAlignment: PdfVerticalAlignment.middle)
+    //           // bounds: Rect.fromLTWH(50, 130, 300, 50)
+    //   );
 
 
 
 
 
-
-
-
-
-
-    graphics.drawRectangle(
+    // graphics.drawRectangle(
       
-        pen: PdfPen(PdfColor(2, 158, 222)),
-        brush: PdfSolidBrush(PdfColor(2, 158, 222)),
-        bounds: Rect.fromPoints(Offset(0, 200), Offset(90, 260)));
+    //     pen: PdfPen(PdfColor(2, 158, 222)),
+    //     brush: PdfSolidBrush(PdfColor(2, 158, 222)),
+    //     bounds: Rect.fromPoints(Offset(100, 200), Offset(190, 260)));
   
 
 
-    graphics.drawString(
-              'Actual Hours',
-              PdfStandardFont(PdfFontFamily.helvetica, 8,
-                  style: PdfFontStyle.bold),
-              brush: PdfBrushes.white,
-              bounds: Rect.fromPoints(Offset(10, 205), Offset(80, 245)),
-               format: PdfStringFormat(
-            alignment: PdfTextAlignment.left, lineAlignment: PdfVerticalAlignment.top)
-              // bounds: Rect.fromLTWH(50, 130, 300, 50)
-      );
-    graphics.drawString(
-              '100 hrs',
-              PdfStandardFont(PdfFontFamily.helvetica, 20,
-                  style: PdfFontStyle.bold),
-              brush: PdfBrushes.white,
-              bounds: Rect.fromPoints(Offset(10, 215), Offset(80, 250)),
-               format: PdfStringFormat(
-            alignment: PdfTextAlignment.left, lineAlignment: PdfVerticalAlignment.middle)
-              // bounds: Rect.fromLTWH(50, 130, 300, 50)
-      );
-
-
-
-
-
-    graphics.drawRectangle(
-      
-        pen: PdfPen(PdfColor(2, 158, 222)),
-        brush: PdfSolidBrush(PdfColor(2, 158, 222)),
-        bounds: Rect.fromPoints(Offset(100, 200), Offset(190, 260)));
-  
-
-
-    graphics.drawString(
-              'Actual Hours',
-              PdfStandardFont(PdfFontFamily.helvetica, 8,
-                  style: PdfFontStyle.bold),
-              brush: PdfBrushes.white,
-              bounds: Rect.fromPoints(Offset(110, 205), Offset(180, 245)),
-               format: PdfStringFormat(
-            alignment: PdfTextAlignment.left, lineAlignment: PdfVerticalAlignment.top)
-              // bounds: Rect.fromLTWH(50, 130, 300, 50)
-      );
-    graphics.drawString(
-              '100 hrs',
-              PdfStandardFont(PdfFontFamily.helvetica, 20,
-                  style: PdfFontStyle.bold),
-              brush: PdfBrushes.white,
-              bounds: Rect.fromPoints(Offset(110, 215), Offset(180, 250)),
-               format: PdfStringFormat(
-            alignment: PdfTextAlignment.left, lineAlignment: PdfVerticalAlignment.middle)
-              // bounds: Rect.fromLTWH(50, 130, 300, 50)
-      );
+    // graphics.drawString(
+    //           'Actual Hours',
+    //           PdfStandardFont(PdfFontFamily.helvetica, 8,
+    //               style: PdfFontStyle.bold),
+    //           brush: PdfBrushes.white,
+    //           bounds: Rect.fromPoints(Offset(110, 205), Offset(180, 245)),
+    //            format: PdfStringFormat(
+    //         alignment: PdfTextAlignment.left, lineAlignment: PdfVerticalAlignment.top)
+    //           // bounds: Rect.fromLTWH(50, 130, 300, 50)
+    //   );
+    // graphics.drawString(
+    //           '100 hrs',
+    //           PdfStandardFont(PdfFontFamily.helvetica, 20,
+    //               style: PdfFontStyle.bold),
+    //           brush: PdfBrushes.white,
+    //           bounds: Rect.fromPoints(Offset(110, 215), Offset(180, 250)),
+    //            format: PdfStringFormat(
+    //         alignment: PdfTextAlignment.left, lineAlignment: PdfVerticalAlignment.middle)
+    //           // bounds: Rect.fromLTWH(50, 130, 300, 50)
+    //   );
 
 
 
@@ -1536,7 +1856,7 @@ document.template.bottom = footer;
 
  PdfGridStyle gridStyle = PdfGridStyle(
  
-  cellSpacing: 2,
+  cellSpacing: 1,
   cellPadding: PdfPaddings(left: 8, right: 0, top: 8, bottom: 5),
   borderOverlapStyle: PdfBorderOverlapStyle.overlap,
 
@@ -1575,9 +1895,24 @@ grid.rows.applyStyle(gridStyle);
     //Add rows style
    
     
-   // Draw the grid
+
+
+  page2.graphics.drawString(
+          'Attendence Record',
+          PdfStandardFont(PdfFontFamily.helvetica, 14,
+              style: PdfFontStyle.bold),
+          brush: PdfSolidBrush(PdfColor(58, 58, 58)),
+          bounds: Rect.fromPoints(Offset(0, 0), Offset(0, 0))
+  );
+
+    page2.graphics.drawLine(
+    PdfPen(PdfColor(58, 58, 58), width: 1),
+    Offset(0, 20),Offset(90, 20));
+
+
+  //  // Draw the grid
     grid.draw(
-        page: page, bounds: const Rect.fromLTWH(0, 300, 0, 0));    
+        page: page2, bounds: const Rect.fromLTWH(0, 30, 0, 0));    
 
 
 
@@ -1615,4 +1950,13 @@ List<int> bytes = await document.save();
             final String x;
             final int y;
             final Color color;
+    }
+
+
+
+
+    class ChartDataProgress {
+        ChartDataProgress(this.x, this.y);
+        final String x;
+        final double y;
     }

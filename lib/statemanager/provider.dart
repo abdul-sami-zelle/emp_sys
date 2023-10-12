@@ -736,6 +736,20 @@ String categorizeArrival2(String actualArrivalTime, String dailyArrival) {
 
 
 
+bool loaderEnable = false;
+enablingLoader(){
+  loaderEnable = true;
+  notifyListeners();
+}
+
+
+disablingLoader(){
+  loaderEnable = false;
+  notifyListeners();
+}
+
+
+
 
 
 
@@ -1107,6 +1121,11 @@ String getTimeDifference(String startTimeStr, String endTimeStr) {
   DateTime startTime = DateTime(0, 1, 1, startTimeParts[0], startTimeParts[1], startTimeParts[2]);
   DateTime endTime = DateTime(0, 1, 1, endTimeParts[0], endTimeParts[1], endTimeParts[2]);
 
+  if (endTime.isBefore(startTime)) {
+    // If end time is before start time, add a day to the end time
+    endTime = endTime.add(Duration(days: 1));
+  }
+
   Duration difference = endTime.difference(startTime);
 
   String twoDigits(int n) => n.toString().padLeft(2, '0');
@@ -1116,7 +1135,6 @@ String getTimeDifference(String startTimeStr, String endTimeStr) {
 
   return '${twoDigits(hours)}:${twoDigits(minutes)}:${twoDigits(seconds)}';
 }
-
 
 
 

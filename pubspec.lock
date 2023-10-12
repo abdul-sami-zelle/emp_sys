@@ -310,6 +310,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "5.9.0"
+  flutter_spinkit:
+    dependency: "direct main"
+    description:
+      name: flutter_spinkit
+      sha256: b39c753e909d4796906c5696a14daf33639a76e017136c8d82bf3e620ce5bb8e
+      url: "https://pub.dev"
+    source: hosted
+    version: "5.2.0"
   flutter_test:
     dependency: "direct dev"
     description: flutter
@@ -617,10 +625,10 @@ packages:
     dependency: transitive
     description:
       name: syncfusion_flutter_core
-      sha256: "505a07deaeb326ae9af5ee4e50937b7563cbb639982e760c26f3511b4fa535d5"
+      sha256: "164a66d2a7fa9972e2a4767fbbf9f42f9fab3fd3c4149a6db72f846d85686f86"
       url: "https://pub.dev"
     source: hosted
-    version: "23.1.39"
+    version: "23.1.40"
   syncfusion_flutter_datagrid:
     dependency: "direct main"
     description:
@@ -629,6 +637,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "23.1.39"
+  syncfusion_flutter_gauges:
+    dependency: "direct main"
+    description:
+      name: syncfusion_flutter_gauges
+      sha256: "6dd4badb9f9a83013672102dc2c43a6b50d6d6f74733e9860c2e7d1f98b9cd1f"
+      url: "https://pub.dev"
+    source: hosted
+    version: "23.1.40"
   syncfusion_flutter_pdf:
     dependency: "direct main"
     description:
