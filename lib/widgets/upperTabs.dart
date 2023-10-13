@@ -32,14 +32,47 @@ class UpperTabs extends StatelessWidget {
     final _controller = ValueNotifier<bool>(active!);
     final size = MediaQuery.of(context).size;
     return Container(
-      height: 160,
-      width: (size.width < 1320 && size.width > 1161)
-          ? 220
-          : (size.width < 1161)
-              ? 190
-              : (size.width > 1600)
-                  ? 270
-                  : 250,
+      height:(size.width < 901 && size.width > 799)
+          ? 105
+          : (size.width < 1000 && size.width > 900)
+          ? 110
+         
+          :(size.width < 1121 && size.width > 1000)
+          ?115
+          :(size.width < 1221 && size.width > 1120)
+          ? 125
+          : (size.width < 1321 && size.width > 1220)
+          ? 135
+          :(size.width < 1496 && size.width > 1320)
+          ?140
+          :(size.width < 1600 && size.width > 1495)
+          ?145
+          :(size.width > 1600 && size.width < 1799)
+          ?200
+          :(size.width < 2100 && size.width > 1800)
+          ?250
+          :160,
+      width:(size.width < 901 && size.width > 799)
+          ? 145
+          :(size.width < 999 && size.width > 900)
+          ? 155
+          :(size.width < 1119 && size.width > 1000)
+          ? 175
+          :(size.width < 1220 && size.width > 1120)
+          ? 195
+          : (size.width < 1320 && size.width > 1220)
+          ? 215
+          :(size.width < 1496 && size.width > 1320)
+          // ?240
+          // :(size.width < 1161)
+          ?230
+          :(size.width > 1496 && size.width < 1731)
+          ?250
+          :(size.width > 1730 && size.width < 1799)
+          ?310
+          :(size.width < 2100 && size.width > 1899)
+          ?340
+          :260,
       decoration: BoxDecoration(
           color: Color(0xff1F2123), borderRadius: BorderRadius.circular(10)),
       child: Padding(
@@ -64,7 +97,10 @@ class UpperTabs extends StatelessWidget {
                     bottom: -2.5,
                     left: -2.5,
                     child: Container(
-                      height: 110,
+                      height:(size.width < 901 && size.width > 799)
+          ? 80
+          :(size.width < 999 && size.width > 900)
+          ? 90:100,
                       width: 90,
                       decoration: BoxDecoration(
                           borderRadius: BorderRadius.only(
@@ -78,7 +114,7 @@ class UpperTabs extends StatelessWidget {
                   ),
                   Positioned(
                       child: Padding(
-                    padding: EdgeInsets.only(top: 15, left: 15),
+                    padding: EdgeInsets.only(top: 10, left: 10),
                     child: Row(
                       children: [
                         Column(
@@ -87,8 +123,14 @@ class UpperTabs extends StatelessWidget {
                           children: [
                             Image.asset(
                               "${img}",
-                              height: 35,
-                              width: 35,
+                              height:(size.width < 901 && size.width > 799)
+          ? 26
+          :(size.width < 999 && size.width > 900)
+          ? 30:35,
+                              width: (size.width < 901 && size.width > 799)
+          ? 26
+          :(size.width < 999 && size.width > 900)
+          ? 30:35,
                             ),
                             SizedBox(
                               height: 5,
@@ -101,7 +143,7 @@ class UpperTabs extends StatelessWidget {
                                   children: [
                                     Multi(
                                         color: Colors.white,
-                                        subtitle: "100",
+                                        subtitle: "$duration",
                                         weight: FontWeight.w600,
                                         size: 7),
                                     SizedBox(
@@ -109,7 +151,7 @@ class UpperTabs extends StatelessWidget {
                                     ),
                                     Multi(
                                         color: color1,
-                                        subtitle: "sec",
+                                        subtitle: "minutes",
                                         weight: FontWeight.w300,
                                         size: 3),
                                   ],
@@ -133,8 +175,14 @@ class UpperTabs extends StatelessWidget {
                     ),
                   )),
                   Positioned(
-                    top: 15,
-                    right: 15,
+                    top: (size.width < 901 && size.width > 799)
+          ? 10
+          :(size.width < 999 && size.width > 900)
+          ? 10:15,
+                    right:(size.width < 901 && size.width > 799)
+          ? 10
+          :(size.width < 999 && size.width > 900)
+          ? 10: 15,
                     child: Stack(
                       children: [
 // AdvancedSwitch(
@@ -153,11 +201,17 @@ class UpperTabs extends StatelessWidget {
 //                         )
                         SlidingSwitch(
                           value: active!,
-                          width: 60,
+                          width: (size.width < 901 && size.width > 799)
+          ? 46
+          :(size.width < 999 && size.width > 900)
+          ? 50:60,
                           onChanged: (bool value) {
                             null;
                           },
-                          height: 30,
+                          height: (size.width < 901 && size.width > 799)
+          ? 21
+          :(size.width < 999 && size.width > 900)
+          ? 25:30,
                           animationDuration: const Duration(milliseconds: 100),
                           onTap: () {
                             Provider11.changeActiveBreakIndex(breakFor!);

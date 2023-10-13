@@ -941,6 +941,26 @@ List<int>? imgGraph;
 
 
 
+// database variable names:
+
+// for call break list:
+String callBreakListDBName = 'Break';
+
+// for casual break list:
+String casualBreakListDBName = 'casualLeave';
+
+// for lunch break list:
+String lunchBreakListDBName = 'lunchBreak';
+
+// for namaz break
+String namazBreakListDBName = 'namazBreak';
+
+// for summit break
+String summitBreakListDBName = 'summitLeave';
+
+
+
+
 
 
 
@@ -1071,6 +1091,288 @@ String categorizeArrival(String actualArrivalTime, String dailyArrival) {
     return "onTime";
   }
 }
+// cases for enabling already enabled breaks:
+
+checkEnabilityBreakBtn(String active,String activeTime){
+
+  switch (active) {
+    case 'Break':
+      call_break = true;
+      call_break_dict['startTime']=activeTime;
+      break;
+
+    case 'namazBreak':
+      namaz_break = true;
+      namaz_break_dict['startTime']=activeTime;
+      break;
+    
+    case 'lunchBreak':
+      lunch_break = true;
+      lunch_break_dict['startTime']=activeTime;
+      break;
+
+    case 'casualBreak':
+      casual_break = true;
+      casual_break_dict['startTime']=activeTime;
+      break;
+
+    case 'summitBreak':
+      summit_break = true;
+      summit_break_dict['startTime']=activeTime;
+      break;
+
+    default:
+  }
+
+  notifyListeners();
+
+}
+
+// last checkin, checkout, shiftStart ,shiftEnd
+
+
+
+String? lastCheckin;
+String? lastCheckout;
+String? lastShiftStart;
+String? lastShiftEnd;
+
+lastStats()async{
+  final ref = FirebaseDatabase.instance.ref();
+  final snapshot = await ref.child('attendence/October 2023/Day/12-10-2023/2dCXtkkraFST33jeRvgG4WWkT9i2').get();
+  Map<String,dynamic> data = snapshot.value as Map<String,dynamic>;
+  print(snapshot.value);
+  lastCheckin = data['checkin'];
+  lastCheckout = data['checkout'];
+  notifyListeners();
+}
+
+
+//
+
+
+// already active break data
+
+String? alreadyActive;
+String? alreadyActiveTime;
+
+
+Duration namazBreakSum = Duration();
+Duration lunchBreakSum = Duration();
+Duration callBreakSum = Duration();
+Duration summitBreakSum = Duration();
+Duration casualBreakSum = Duration();
+
+
+
+// check either collection exist or not?
+
+Future<bool> doesCollectionExist() async {
+  try {
+    final DocumentSnapshot document = await FirebaseFirestore.instance.collection('morning_Shift').doc('2dCXtkkraFST33jeRvgG4WWkT9i2').collection('2023-10-01').doc('2dCXtkkraFST33jeRvgG4WWkT9i2').get();
+    if (document.exists) {
+      Map<String,dynamic> data = document.data() as Map<String,dynamic>;
+        // Initialize variables to store the sum of durations
+  // Iterate through callBreak and calculate the sum of durations
+ data["$callBreakListDBName"]!=[]? data["$callBreakListDBName"].forEach((item) {
+    final List<dynamic> durationParts = item["duration"].split(':').map(int.parse).toList();
+    final Duration duration = Duration(
+      hours: durationParts[0],
+      minutes: durationParts[1],
+      seconds: durationParts[2],
+    );
+    callBreakSum += duration;
+  }):null;
+
+
+
+
+  // Iterate through namazBreak and calculate the sum of durations
+ data["$namazBreakListDBName"]!=[]? data["$namazBreakListDBName"].forEach((item) {
+    final List<dynamic> durationParts = item["duration"].split(':').map(int.parse).toList();
+    final Duration duration = Duration(
+      hours: durationParts[0],
+      minutes: durationParts[1],
+      seconds: durationParts[2],
+    );
+    namazBreakSum += duration;
+  }):null;
+
+  // Iterate through lunchBreak and calculate the sum of durations
+ data["$lunchBreakListDBName"]!=[]? data["$lunchBreakListDBName"].forEach((item) {
+    final List<dynamic> durationParts = item["duration"].split(':').map(int.parse).toList();
+    final Duration duration = Duration(
+      hours: durationParts[0],
+      minutes: durationParts[1],
+      seconds: durationParts[2],
+    );
+    lunchBreakSum += duration;
+  }):null;
+
+
+    // Iterate through casualBreak and calculate the sum of durations
+ data["$casualBreakListDBName"]!=[]? data["$casualBreakListDBName"].forEach((item) {
+    final List<dynamic> durationParts = item["duration"].split(':').map(int.parse).toList();
+    final Duration duration = Duration(
+      hours: durationParts[0],
+      minutes: durationParts[1],
+      seconds: durationParts[2],
+    );
+    casualBreakSum += duration;
+  }):null;
+
+
+      // Iterate through summitBreak and calculate the sum of durations
+  data["$summitBreakListDBName"]!=[]? data["$summitBreakListDBName"].forEach((item) {
+    final List<dynamic> durationParts = item["duration"].split(':').map(int.parse).toList();
+    final Duration duration = Duration(
+      hours: durationParts[0],
+      minutes: durationParts[1],
+      seconds: durationParts[2],
+    );
+    summitBreakSum += duration;
+  }):null;
+
+  print("Total Namaz Break Duration: $callBreakSum");
+  print("Total Lunch Break Duration: $namazBreakSum");
+  print("Total Namaz Break Duration: $lunchBreakSum");
+  print("Total Lunch Break Duration: $casualBreakSum");
+  print("Total Lunch Break Duration: $summitBreakSum");
+
+
+ lastStats();
+
+
+
+      // coditions for checking either he started shift or end or not
+      if (data['startShift']!="" && data['endShift']!="") {
+        print("your todays shift is complete");
+      } else if(data['startShift']!="" && data['endShift']=="") {
+       await enableShiftStartButton();
+       if (data['active']!="" && data['activeStartTime']!="") {
+         checkEnabilityBreakBtn(data['active'].toString(),data['activeStartTime'].toString());
+       } else {
+         
+       }
+        print("your todays shift is  at ${data['startShift']}");
+      }
+      else{
+
+      }
+      //--
+      
+    } else {
+      // Document doesn't exist.
+      return false;
+    }
+ 
+    return document.exists;
+  } catch (e) {
+
+    // If an error occurs, the collection doesn't exist.
+    print(" not exists $e");
+    return false;
+  }
+  
+}
+
+
+
+  Future<void> updateActiveData(var breakOf) {
+    
+    return morning_Shift
+        .doc("2dCXtkkraFST33jeRvgG4WWkT9i2")
+        .collection("2023-10-01")
+        .doc("2dCXtkkraFST33jeRvgG4WWkT9i2")
+        .update({
+      "active": breakOf.toString(),
+      "activeStartTime":DateTime.now().toString().substring(11,19)
+    });
+  }
+
+
+  Future<void> updateActiveDataLocally(var breakOf) {
+    FirebaseFirestore.instance.enablePersistence();
+    return morning_Shift
+        .doc("2dCXtkkraFST33jeRvgG4WWkT9i2")
+        .collection("2023-10-01")
+        .doc("2dCXtkkraFST33jeRvgG4WWkT9i2")
+        .update({
+       "active": breakOf.toString(),
+       "activeStartTime":DateTime.now().toString().substring(11,19)
+    });
+  }
+
+
+
+  Future<void> updateActivetoNull() {
+    
+    return morning_Shift
+        .doc("2dCXtkkraFST33jeRvgG4WWkT9i2")
+        .collection("2023-10-01")
+        .doc("2dCXtkkraFST33jeRvgG4WWkT9i2")
+        .update({
+      "active": "",
+      "activeStartTime":""
+    });
+  }
+
+
+
+
+
+
+  Future<void> updateActivetoNullLocally() {
+    FirebaseFirestore.instance.enablePersistence();
+    return morning_Shift
+        .doc("2dCXtkkraFST33jeRvgG4WWkT9i2")
+        .collection("2023-10-01")
+        .doc("2dCXtkkraFST33jeRvgG4WWkT9i2")
+        .update({
+      "active": "",
+      "activeStartTime":""
+    });
+  }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -1083,7 +1385,7 @@ var stack_namaz_data =[];
 
 // find time difference 
 
-String timeDifference(String time1,String time2) {
+String timeDifferenceString(String time1,String time2) {
   // Parse the time strings into DateTime objects
   DateTime dateTime1 = DateTime.parse("2023-01-01 $time1");
   DateTime dateTime2 = DateTime.parse("2023-01-01 $time2");
@@ -1096,9 +1398,20 @@ String timeDifference(String time1,String time2) {
   int minutes = (difference.inMinutes % 60);
   int seconds = (difference.inSeconds % 60);
   
-  return "$hours:$minutes:$seconds" ;
+  return "${difference.inHours}:${(difference.inMinutes % 60)}:${(difference.inSeconds % 60)}" ;
 }
 
+
+Duration timeDifference(String time1, String time2) {
+  // Parse the time strings into DateTime objects
+  DateTime dateTime1 = DateTime.parse("2023-01-01 $time1");
+  DateTime dateTime2 = DateTime.parse("2023-01-01 $time2");
+
+  // Calculate the time difference
+  Duration difference = dateTime2.difference(dateTime1);
+
+  return difference;
+}
 
 
 
@@ -1167,6 +1480,12 @@ String getTimeDifference(String startTimeStr, String endTimeStr) {
   var summit_break_controller = ValueNotifier<bool>(false);
 
   String? activeBreakIndex;
+
+  enableShiftStartButton(){
+    shiftStarted = true;
+    notifyListeners();
+  }
+
 
   startShiftTime()async {
     
@@ -1262,17 +1581,25 @@ checkInternetConnectivity() async {
         if(call_break == true){
           call_break = false;
           call_break_dict['endTime']=DateTime.now().toString().substring(11,19);
-          call_break_dict['duration'] = timeDifference(call_break_dict['startTime'], call_break_dict['endTime']);
+          call_break_dict['duration'] = timeDifferenceString(call_break_dict['startTime'], call_break_dict['endTime']);
+          callBreakSum += timeDifference(call_break_dict['startTime'], call_break_dict['endTime']);
           await checkInternetConnectivity();
            if (internetAvailabilty=="yes") {
            updateBreaksData(call_break_dict,"Break");
+          await updateActivetoNull();
           } else {
-            
             updateBreaksDataLocally(call_break_dict,"Break");
+            updateActivetoNull();
           }
           call_break_dict={};
         }else if(call_break == false){
           call_break = true;
+          if (internetAvailabilty=="yes") {
+            await updateActiveData('Break');
+          }else{
+            await updateActiveDataLocally('Break');
+          }
+          
           call_break_dict['startTime']=DateTime.now().toString().substring(11,19);
         }
         
@@ -1290,17 +1617,25 @@ checkInternetConnectivity() async {
       if(namaz_break == true){
           namaz_break = false;
           namaz_break_dict['endTime']=DateTime.now().toString().substring(11,19);
-          namaz_break_dict['duration'] = timeDifference(namaz_break_dict['startTime'], namaz_break_dict['endTime']);
+          namaz_break_dict['duration'] = timeDifferenceString(namaz_break_dict['startTime'], namaz_break_dict['endTime']);
+          namazBreakSum += timeDifference(namaz_break_dict['startTime'], namaz_break_dict['endTime']);
           await checkInternetConnectivity();
           if (internetAvailabilty=="yes") {
           updateBreaksData(namaz_break_dict,"namazBreak");
+          updateActivetoNull();
           } else {
           
             updateBreaksDataLocally(namaz_break_dict,"namazBreak");
+            updateActivetoNullLocally();
           }
           namaz_break_dict={};
         }else if(namaz_break == false){
           namaz_break = true;
+           if (internetAvailabilty=="yes") {
+            await updateActiveData('namazBreak');
+          }else{
+            await updateActiveDataLocally('namazBreak');
+          }
           namaz_break_dict['startTime']=DateTime.now().toString().substring(11,19);
         }
         call_break = false;
@@ -1318,17 +1653,25 @@ checkInternetConnectivity() async {
          if(lunch_break == true){
           lunch_break = false;
           lunch_break_dict['endTime']=DateTime.now().toString().substring(11,19);
-          lunch_break_dict['duration'] = timeDifference(lunch_break_dict['startTime'], lunch_break_dict['endTime']);
+          lunch_break_dict['duration'] = timeDifferenceString(lunch_break_dict['startTime'], lunch_break_dict['endTime']);
+          lunchBreakSum += timeDifference(lunch_break_dict['startTime'], lunch_break_dict['endTime']);
           await checkInternetConnectivity();
           if (internetAvailabilty=="yes") {
           updateBreaksData(lunch_break_dict,"lunchBreak");
+          updateActivetoNull();
           } else {
           
             updateBreaksDataLocally(lunch_break_dict,"lunchBreak");
+            updateActivetoNullLocally();
           }
           lunch_break_dict={};
         }else if(lunch_break == false){
           lunch_break = true;
+          if (internetAvailabilty=="yes") {
+            await updateActiveData('lunchBreak');
+          }else{
+            await updateActiveDataLocally('lunchBreak');
+          }
           lunch_break_dict['startTime']=DateTime.now().toString().substring(11,19);
         }
         call_break = false;
@@ -1345,17 +1688,25 @@ checkInternetConnectivity() async {
       if(casual_break == true){
           casual_break = false;
          casual_break_dict['endTime']=DateTime.now().toString().substring(11,19);
-          casual_break_dict['duration'] = timeDifference(casual_break_dict['startTime'], casual_break_dict['endTime']);
+          casual_break_dict['duration'] = timeDifferenceString(casual_break_dict['startTime'], casual_break_dict['endTime']);
+          casualBreakSum += timeDifference(casual_break_dict['startTime'], casual_break_dict['endTime']);
           await checkInternetConnectivity();
           if (internetAvailabilty=="yes") {
           updateBreaksData(casual_break_dict,"casualLeave");
+          updateActivetoNull();
           } else {
-          
+            
             updateBreaksDataLocally(casual_break_dict,"casualLeave");
+            updateActivetoNullLocally();
           }
           casual_break_dict={};
         }else if(casual_break == false){
           casual_break = true;
+           if (internetAvailabilty=="yes") {
+            await updateActiveData('casualBreak');
+          }else{
+            await updateActiveDataLocally('casualBreak');
+          }
           casual_break_dict['startTime']=DateTime.now().toString().substring(11,19);
         }
        
@@ -1372,17 +1723,25 @@ checkInternetConnectivity() async {
        if(summit_break == true){
           summit_break = false;
           summit_break_dict['endTime']=DateTime.now().toString().substring(11,19);
-          summit_break_dict['duration'] = timeDifference(summit_break_dict['startTime'], summit_break_dict['endTime']);
+          summit_break_dict['duration'] = timeDifferenceString(summit_break_dict['startTime'], summit_break_dict['endTime']);
+           summitBreakSum += timeDifference(summit_break_dict['startTime'], summit_break_dict['endTime']);
           await checkInternetConnectivity();
           if (internetAvailabilty=="yes") {
           updateBreaksData(summit_break_dict,"summitBreak");
+          updateActivetoNull();
           } else {
-          
+            
             updateBreaksDataLocally(summit_break_dict,"summitBreak");
+            updateActivetoNullLocally();
           }
           summit_break_dict={};
         }else if(summit_break == false){
           summit_break = true;
+           if (internetAvailabilty=="yes") {
+            await updateActiveData('summitBreak');
+          }else{
+            await updateActiveDataLocally('summitBreak');
+          }
           summit_break_dict['startTime']=DateTime.now().toString().substring(11,19);
         }
         
@@ -1431,7 +1790,7 @@ checkInternetConnectivity() async {
   var summit_break_dict={};
   var summit_break_list =[];
 
-  int activeTab = 3;
+  int activeTab = 0;
 
   changeSideTab(int tabIndex) {
     activeTab = tabIndex;

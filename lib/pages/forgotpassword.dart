@@ -77,6 +77,17 @@ class ForgotPassword extends StatelessWidget {
                                 width: 3,
                               )),
                           child: TextFormField(
+                              onFieldSubmitted: (value) {
+                if (_formKey.currentState!.validate()) {
+                   Provider11.ResetPassword(email.text);
+                              showDialog(
+                                  context: context,
+                                  builder: (BuildContext context) {
+                                    return popup();
+                                  },
+                                );
+                }
+              },
                             controller: email,
                             
                             validator: (value) =>

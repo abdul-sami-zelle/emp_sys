@@ -1,3 +1,4 @@
+import 'package:emp_sys/utils/sizedBoxHeadingtoContent.dart';
 import 'package:emp_sys/widgets/multi.dart';
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
@@ -10,47 +11,82 @@ class pieChartData extends StatelessWidget {
     final size = MediaQuery.of(context).size;
     return Container(
     width: size.width/5,
-    height: 400,
+    
   decoration: BoxDecoration(
   color: Color(0xff1F2123),
   borderRadius: BorderRadius.circular(10)
 ),
-child: Column(
-  mainAxisAlignment: MainAxisAlignment.center,
-  children: [
-    Padding(
-      padding:EdgeInsets.symmetric(horizontal: 10),
-      child: Row(
+child: Padding(
+  padding:EdgeInsets.symmetric(horizontal: 10,vertical: 10),
+  child:   Column(
+  
+    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  
+    children: [
+  
+  
+  
+      Row(
+  
         mainAxisAlignment: MainAxisAlignment.start,
+  
         children: [
+  
           Multi(color: Colors.white, subtitle: "Statistics", weight: FontWeight.w400, size: 4),
+  
         ],
+  
       ),
-    ),
-    SizedBox(height: 20,),
-    Dougnut(),
-    SizedBox(height: 10,),
-    Container(
-      width: size.width/5.5,
-      height: 130,
-       decoration: BoxDecoration(
-  color: Color(0xff424344),
-  borderRadius: BorderRadius.circular(10)
-),
-child: Column(
-  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-  crossAxisAlignment: CrossAxisAlignment.center,
-  children: [
-    pieChartLegends(legendColor: Colors.amber, legendName: 'Productive Hours', legendPercent: '5',),
-    pieChartLegends(legendColor: Color(0xff64FDC2), legendName: 'Call Break Hours', legendPercent: '5',),
-    pieChartLegends(legendColor: Color(0xffFFB976), legendName: 'Namaz Break Hours', legendPercent: '5',),
-    pieChartLegends(legendColor: Color(0xffAE8BFF), legendName: 'Linch Break Hours', legendPercent: '5',),
-    pieChartLegends(legendColor: Color(0xff48A7FF), legendName: 'Casual Break Hours', legendPercent: '5',),
-    pieChartLegends(legendColor: Color(0xff4832A2), legendName: 'Summit Break Hours', legendPercent: '5',)
-  ],
-),
-    )
-  ],
+  
+      SizedBoxHeadtoCont(),
+  
+      Dougnut(),
+  
+      SizedBoxHeadtoCont(),
+  
+      Container(
+  
+        width: size.width/5.5,
+  
+     
+  
+         decoration: BoxDecoration(
+  
+    color: Color(0xff424344),
+  
+    borderRadius: BorderRadius.circular(10)
+  
+  ),
+  
+  child: Column(
+  
+    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+  
+    crossAxisAlignment: CrossAxisAlignment.center,
+  
+    children: [
+      SizedBox(height: 5,),
+      pieChartLegends(legendColor: Colors.amber, legendName: 'Productive Hours', legendPercent: '5',),
+  
+      pieChartLegends(legendColor: Color(0xff64FDC2), legendName: 'Call Break Hours', legendPercent: '5',),
+  
+      pieChartLegends(legendColor: Color(0xffFFB976), legendName: 'Namaz Break Hours', legendPercent: '5',),
+  
+      pieChartLegends(legendColor: Color(0xffAE8BFF), legendName: 'Linch Break Hours', legendPercent: '5',),
+  
+      pieChartLegends(legendColor: Color(0xff48A7FF), legendName: 'Casual Break Hours', legendPercent: '5',),
+  
+      pieChartLegends(legendColor: Color(0xff4832A2), legendName: 'Summit Break Hours', legendPercent: '5',)
+  
+    ],
+  
+  ),
+  
+      )
+  
+    ],
+  
+  ),
 ),
 );
 
@@ -176,7 +212,7 @@ class pieChartLegends extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return    Padding(
-      padding:  EdgeInsets.symmetric(horizontal: 10),
+      padding:  EdgeInsets.only(left: 10,right: 10,bottom: 5),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -193,10 +229,10 @@ class pieChartLegends extends StatelessWidget {
     ),
           ),
           SizedBox(width: 6,),
-          Multi(color: Colors.white, subtitle: "$legendName", weight: FontWeight.w300, size: 3),
+          Multi(color: Colors.white, subtitle: "$legendName", weight: FontWeight.w300, size: 2),
         ],
       ),
-       Multi(color: Colors.white, subtitle: "${legendPercent}%", weight: FontWeight.w300, size: 3),
+       Multi(color: Colors.white, subtitle: "${legendPercent}%", weight: FontWeight.w300, size: 2),
         ],
       ),
     );

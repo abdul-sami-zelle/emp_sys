@@ -57,10 +57,15 @@ class LandingPage extends StatelessWidget {
                               mainAxisAlignment: MainAxisAlignment.start,
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                               
+                                Expanded(
+                                  flex: 4,
+                                  child: cappbar()),
                                 Expanded(
                                   flex: 30,
-                                  child:Provider11.activeTab==4? SingleChildScrollView(
+                                  child:Provider11.activeTab==0?
+                                  
+                                  
+                                   SingleChildScrollView(
                                     child: Column(children: [
                                     
                                                            
@@ -84,7 +89,7 @@ class LandingPage extends StatelessWidget {
                                                           SizedBox(height: 20,),
                                                               // Container(height: 350.h, child: const clock()),
                                                               Container(height: 160, child: TopPanel()),
-                                                              SizedBox(height: 25,),
+                                                              SizedBox(height: 15,),
                                                               Container(height: 400, child:  Padding(
                                     
                                     padding:  EdgeInsets.symmetric(horizontal: 25),
@@ -96,15 +101,15 @@ class LandingPage extends StatelessWidget {
                                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                           children: [
                                             Container(
-                                              width: size.width/3,
-                                              height: 200,
+                                              width: size.width/2.85,
+                                              height: 210,
                                                decoration: BoxDecoration(
                                     color: Color(0xff1F2123),
                                     borderRadius: BorderRadius.circular(10)
                                                               ),
                                               child: HomeScreen()),
                                                Container(
-                                              width: size.width/3,
+                                              width: size.width/2.85,
                                               height: 170,
                                                decoration: BoxDecoration(
                                     color: Color(0xff1F2123),
@@ -118,15 +123,12 @@ class LandingPage extends StatelessWidget {
                                         ),
                                         
                                           Container(
-                                          width: size.width/3,
+                                          width: size.width/2.85,
                                            decoration: BoxDecoration(
                                     color: Color(0xff1F2123),
                                     borderRadius: BorderRadius.circular(10)
                                                               ),
-                                          child: Padding(
-                                            padding:  EdgeInsets.only(top: 8,right: 15,bottom: 8,left: 8),
-                                            child: AttendanceChart(),
-                                          )),
+                                          child: AttendanceChart()),
                                            pieChartData(),
                                             // TimeTrakingReports()
                                        
@@ -134,7 +136,7 @@ class LandingPage extends StatelessWidget {
                                     ),
                                                               ),),
                                                               ],),
-                                  ):Provider11.activeTab==1?TimeTrakingReports():Provider11.activeTab==0?AttendanceData():Provider11.activeTab==3?Reports():Container()),
+                                  ):Provider11.activeTab==1?TimeTrakingReports():Provider11.activeTab==2?AttendanceData():Provider11.activeTab==3?Reports():Container()),
                               
                               ],
                             ),
@@ -155,7 +157,9 @@ class LandingPage extends StatelessWidget {
 
             ),
             child:spinkit ,
-          ):Container()
+          ):Container(),
+
+       
         ],
       ),
     );
@@ -165,7 +169,7 @@ class LandingPage extends StatelessWidget {
 
 
 final spinkit = SpinKitSpinningLines(
-  color: Colors.purple,
+  color: Color.fromARGB(255, 182, 42, 190),
 size: 50,
  
 );

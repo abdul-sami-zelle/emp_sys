@@ -1,12 +1,16 @@
+import 'package:emp_sys/statemanager/provider.dart';
+import 'package:emp_sys/utils/sizedBoxHeadingtoContent.dart';
 import 'package:emp_sys/widgets/digitalText.dart';
 import 'package:emp_sys/widgets/multi.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class LastStatis extends StatelessWidget {
   const LastStatis({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final Provider11 = Provider.of<Provider1>(context, listen: true);
     return  Column(
                           children: [
                             Expanded(
@@ -32,15 +36,16 @@ class LastStatis extends StatelessWidget {
                                           Image.asset("assets/images/in.png",height: 35,width: 35,),
                                         ],
                                       ),
-                                      Column(
+                                  SizedBoxHeadtoCont(),
+                                     Column(
                                         children: [
                                           Row(
                                 crossAxisAlignment: CrossAxisAlignment.end,
                                 // mainAxisAlignment: MainAxisAlignment.end,
                                 children: [
-                                  Multi(
+                                  Digital(
                                       color: Colors.white,
-                                      subtitle: "100",
+                                      subtitle: "${Provider11.lastCheckin}",
                                       weight: FontWeight.w600,
                                       size: 5),
                                   SizedBox(
@@ -48,7 +53,7 @@ class LastStatis extends StatelessWidget {
                                   ),
                                   Multi(
                                       color: Colors.white,
-                                      subtitle: "sec",
+                                      subtitle: "",
                                       weight: FontWeight.w300,
                                       size: 3),
                                 ],
@@ -83,15 +88,16 @@ class LastStatis extends StatelessWidget {
                                           Image.asset("assets/images/out1.png",height: 35,width: 35,),
                                         ],
                                       ),
+                                      SizedBoxHeadtoCont(),
                                       Column(
                                         children: [
                                           Row(
                                 crossAxisAlignment: CrossAxisAlignment.end,
                                 // mainAxisAlignment: MainAxisAlignment.end,
                                 children: [
-                                  Multi(
+                                  Digital(
                                       color: Colors.white,
-                                      subtitle: "100",
+                                      subtitle: "${Provider11.lastCheckout}",
                                       weight: FontWeight.w600,
                                       size: 5),
                                   SizedBox(
@@ -99,7 +105,7 @@ class LastStatis extends StatelessWidget {
                                   ),
                                   Multi(
                                       color: Colors.white,
-                                      subtitle: "sec",
+                                      subtitle: "",
                                       weight: FontWeight.w300,
                                       size: 3),
                                 ],
@@ -138,9 +144,10 @@ class LastStatis extends StatelessWidget {
                                   subtitle: "Last Shift Start",
                                   weight: FontWeight.bold,
                                   size: 3.5),
-                                          Image.network("assets/images/shiftStart.png",height: 30,width: 30,),
+                                          Image.asset("assets/images/shiftStart.png",height: 30,width: 30,),
                                         ],
                                       ),
+                                      SizedBoxHeadtoCont(),
                                       Column(
                                         children: [
                                           Row(
@@ -189,9 +196,10 @@ class LastStatis extends StatelessWidget {
                                   subtitle: "Last Shift End",
                                   weight: FontWeight.bold,
                                   size: 3.5),
-                                          Image.network("assets/images/shiftend.png",height: 30,width: 30,),
+                                          Image.asset("assets/images/shiftend.png",height: 30,width: 30,),
                                         ],
                                       ),
+                                      SizedBoxHeadtoCont(),
                                       Column(
                                         children: [
                                           Row(

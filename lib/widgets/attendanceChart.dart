@@ -1,3 +1,4 @@
+import 'package:emp_sys/utils/sizedBoxHeadingtoContent.dart';
 import 'package:emp_sys/widgets/multi.dart';
 import 'package:flutter/material.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
@@ -18,81 +19,81 @@ class AttendanceChart extends StatelessWidget {
             ChartData(2005,7, 10, 12 ),
             ChartData(2006,6, 6, 10 ),
         ];
-        return Column(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-               SizedBox(height: 10,),
-           Padding(
-        padding:EdgeInsets.symmetric(horizontal: 10),
+        return Padding(
+          padding:EdgeInsets.symmetric(horizontal: 10,vertical: 10),
+          child: Column(
+               mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+               
+             Row(
+               mainAxisAlignment: MainAxisAlignment.start,
+               children: [
+                 Multi(color: Colors.white, subtitle: "Arrivals", weight: FontWeight.w400, size: 4),
+               ],
+             ),
+              SizedBoxHeadtoCont(),
+              Container(
+                  child: SfCartesianChart(
+                  plotAreaBorderWidth: 0,
+                  
+                       primaryXAxis: NumericAxis( 
+                  //Hide the gridlines of x-axis 
+                  majorGridLines: MajorGridLines(width: 0), 
+                  //Hide the axis line of x-axis 
+                  axisLine: AxisLine(width: 0), 
+              ), 
+         
+              primaryYAxis: NumericAxis( 
+                  //Hide the gridlines of y-axis 
+                  majorGridLines: MajorGridLines(width: 1), 
+                  //Hide the axis line of y-axis 
+                  axisLine: AxisLine(width: 1) 
+                     ), 
+                    
+                    enableAxisAnimation: true,
+        
+                    backgroundColor: Color(0xff1F2123),
+                      series: <ChartSeries>[
+                        
+                          SplineSeries<ChartData, int>(
+                              dataSource: chartData,
+                              xValueMapper: (ChartData data, _) => data.x,
+                              yValueMapper: (ChartData data, _) => data.y,
+                              color: Colors.red
+                              ),
+                          SplineSeries<ChartData, int>(
+                              dataSource: chartData,
+                              xValueMapper: (ChartData data, _) => data.x,
+                              yValueMapper: (ChartData data, _) => data.x2,
+                              color: Colors.green
+                              ),
+                          SplineSeries<ChartData, int>(
+                              dataSource: chartData,
+                              xValueMapper: (ChartData data, _) => data.x,
+                              yValueMapper: (ChartData data, _) => data.x3,
+                              color: Colors.amber
+                              )
+                          ]
+                      )
+                  ),
+                  Container(
+                      width: size.width/4,
+              height: 30,
+               decoration: BoxDecoration(
+          color: Color(0xff424344),
+          borderRadius: BorderRadius.circular(10)
+        ),
         child: Row(
-          mainAxisAlignment: MainAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
-            Multi(color: Colors.white, subtitle: "Arrivals", weight: FontWeight.w400, size: 4),
+            AttendanceChartLegends(legendColor: Colors.red, legendName: "Late arrival"),
+            AttendanceChartLegends(legendColor: Colors.green, legendName: "On Time"),
+            AttendanceChartLegends(legendColor: Colors.amber, legendName: "15 min Late"),
           ],
         ),
-      ),
-      SizedBox(height: 10,),
-            Container(
-                child: SfCartesianChart(
-                plotAreaBorderWidth: 0,
-                
-                     primaryXAxis: NumericAxis( 
-                //Hide the gridlines of x-axis 
-                majorGridLines: MajorGridLines(width: 0), 
-                //Hide the axis line of x-axis 
-                axisLine: AxisLine(width: 0), 
-            ), 
- 
-            primaryYAxis: NumericAxis( 
-                //Hide the gridlines of y-axis 
-                majorGridLines: MajorGridLines(width: 1), 
-                //Hide the axis line of y-axis 
-                axisLine: AxisLine(width: 1) 
-                   ), 
-                  
-                  enableAxisAnimation: true,
-
-                  backgroundColor: Color(0xff1F2123),
-                    series: <ChartSeries>[
-                      
-                        SplineSeries<ChartData, int>(
-                            dataSource: chartData,
-                            xValueMapper: (ChartData data, _) => data.x,
-                            yValueMapper: (ChartData data, _) => data.y,
-                            color: Colors.red
-                            ),
-                        SplineSeries<ChartData, int>(
-                            dataSource: chartData,
-                            xValueMapper: (ChartData data, _) => data.x,
-                            yValueMapper: (ChartData data, _) => data.x2,
-                            color: Colors.green
-                            ),
-                        SplineSeries<ChartData, int>(
-                            dataSource: chartData,
-                            xValueMapper: (ChartData data, _) => data.x,
-                            yValueMapper: (ChartData data, _) => data.x3,
-                            color: Colors.amber
-                            )
-                        ]
-                    )
-                ),
-                Container(
-                    width: size.width/4,
-      height: 30,
-       decoration: BoxDecoration(
-  color: Color(0xff424344),
-  borderRadius: BorderRadius.circular(10)
-),
-child: Row(
-  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-  children: [
-    AttendanceChartLegends(legendColor: Colors.red, legendName: "Late arrival"),
-    AttendanceChartLegends(legendColor: Colors.green, legendName: "On Time"),
-    AttendanceChartLegends(legendColor: Colors.amber, legendName: "15 min Late"),
-  ],
-),
-                )
-          ],
+                  )
+            ],
+          ),
         );
         }
     
