@@ -1,4 +1,5 @@
 import 'package:emp_sys/pages/attendanceData.dart';
+import 'package:emp_sys/pages/profile.dart';
 import 'package:emp_sys/pages/reports.dart';
 import 'package:emp_sys/pages/timeTrackingData.dart';
 import 'package:emp_sys/statemanager/provider.dart';
@@ -107,7 +108,9 @@ class LandingPage extends StatelessWidget {
                                     color: Color(0xff1F2123),
                                     borderRadius: BorderRadius.circular(10)
                                                               ),
-                                              child: HomeScreen()),
+                                              child:Provider11.arrivalButtonsEnability==true?HomeScreen():
+                                           ResponseSubmitted()
+                                              ),
                                                Container(
                                               width: size.width/2.85,
                                               height: 170,
@@ -136,7 +139,7 @@ class LandingPage extends StatelessWidget {
                                     ),
                                                               ),),
                                                               ],),
-                                  ):Provider11.activeTab==1?TimeTrakingReports():Provider11.activeTab==2?AttendanceData():Provider11.activeTab==3?Reports():Container()),
+                                  ):Provider11.activeTab==1?TimeTrakingReports():Provider11.activeTab==2?AttendanceData():Provider11.activeTab==3?Reports():EmployeeProfile()),
                               
                               ],
                             ),
@@ -173,3 +176,8 @@ final spinkit = SpinKitSpinningLines(
 size: 50,
  
 );
+
+
+
+
+

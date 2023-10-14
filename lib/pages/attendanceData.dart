@@ -66,8 +66,8 @@ String _selectedValue =  DateFormat('MMMM yyyy').format(DateTime.now());
 
 
 
-String? statusCategorization(String dailyArrival) {
-  String actualArrivalTime = "08:00:00 AM";
+String? statusCategorization(String dailyArrival, String actualArrivalTime ) {
+
 
   String arrivalCategory = categorizeArrival(actualArrivalTime, dailyArrival);
   return arrivalCategory;
@@ -163,13 +163,13 @@ late GlobalKey<SfCartesianChartState> _cartesianChartKey;
     Future fetchFireBaseData()async{
          attenData = [];
  lateArrival = [];
-
+index = 0; 
  onTimemArrival = [];
 
  late15min = [];
    attenDates = [];
   final ref = FirebaseDatabase.instance.ref();
-final snapshot = await ref.child('attendence/${_selectedValue}/Day').get();
+final snapshot = await ref.child('attendence/${_selectedValue}/${Provider11.shift_}').get();
 if (snapshot.exists) {
   final Map<String, dynamic> data = snapshot.value as Map<String, dynamic>;
 
@@ -177,7 +177,7 @@ if (snapshot.exists) {
     final Map<String, dynamic> uidData = {};
     
     // Specify the UID you want to retrieve
-    final desiredUid = "2dCXtkkraFST33jeRvgG4WWkT9i2";
+    final desiredUid = Provider11.uid;
 
     // Loop through the data and extract data for the desired UID
     data.forEach((date, dateData) {
@@ -187,7 +187,7 @@ if (snapshot.exists) {
         uidData[date] = dateData[desiredUid];
        
         print(uidData[date]['checkin'].toString());
-        uidData[date]['checkin']==null?index--:graphData.add(AttendanceChartData1(x: date, y:statusCategorization(uidData[date]['checkin']), early: onTimemArrival[index-1], late: lateArrival[index-1], late15:late15min[index-1]));
+        uidData[date]['checkin']==null?index--:graphData.add(AttendanceChartData1(x: date, y:statusCategorization(uidData[date]['checkin'],Provider11.in_.toString()), early: onTimemArrival[index-1], late: lateArrival[index-1], late15:late15min[index-1]));
       }
     });
     print("${uidData} data is herere");
@@ -425,7 +425,7 @@ return attenData;
                                              
                                                   },
                                                   child: AttendenceBox(checkin: attenData[index]['checkin'].toString(), checkout: attenData[index]['checkout'].toString(), hours: 
-                                  ((attenData[index]['checkin'].toString()=="null") || (attenData[index]['checkout'].toString()=="null"))?  "null":  Provider11.differenceShiftTime(attenData[index]['checkin'].toString(),attenData[index]['checkout'].toString()), dates: attenDates[index].toString(), status:attenData[index]['checkin'].toString()=="null"?"null": Provider11.statusCategorization(attenData[index]['checkin'].toString()).toString(),)
+                                  ((attenData[index]['checkin'].toString()=="null") || (attenData[index]['checkout'].toString()=="null"))?  "null":  Provider11.getTimeDifference(attenData[index]['checkin'].toString(),attenData[index]['checkout'].toString()), dates: attenDates[index].toString(), status:attenData[index]['checkin'].toString()=="null"?"null": Provider11.statusCategorization(attenData[index]['checkin'].toString()).toString(),)
                                             );
                                           },
                                         ),

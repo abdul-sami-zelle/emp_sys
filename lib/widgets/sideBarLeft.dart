@@ -1,3 +1,4 @@
+import 'package:emp_sys/pages/login.dart';
 import 'package:emp_sys/statemanager/provider.dart';
 import 'package:emp_sys/widgets/multi.dart';
 import 'package:flutter/material.dart';
@@ -152,18 +153,24 @@ class SideBarLeft extends StatelessWidget {
           ),
           Column(
             children: [
-              Container(
-                   width: double.infinity,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Image.network("https://cdn-icons-png.flaticon.com/128/1828/1828479.png",color:  Color(0xff8F95A2),height: 23,width: 23,),
-                        SizedBox(height: 5,),
-                        Multi(color:  Color(0xff8F95A2), subtitle: "Log Out", weight: FontWeight.w400, size: 0)
-                      ],
-                    ),
-                   ),
+              GestureDetector(
+                onTap: ()async{
+                 await Provider11.clearProvider();
+                  Navigator.pushReplacement(context, MaterialPageRoute(builder: (BuildContext context) => LoginPage()));
+                },
+                child: Container(
+                     width: double.infinity,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Image.network("https://cdn-icons-png.flaticon.com/128/1828/1828479.png",color:  Color(0xff8F95A2),height: 23,width: 23,),
+                          SizedBox(height: 5,),
+                          Multi(color:  Color(0xff8F95A2), subtitle: "Log Out", weight: FontWeight.w400, size: 0)
+                        ],
+                      ),
+                     ),
+              ),
               SizedBox(height: 20,),
             ],
           ),

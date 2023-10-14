@@ -1,5 +1,6 @@
 import 'package:emp_sys/statemanager/provider.dart';
 import 'package:emp_sys/utils/sizedBoxHeadingtoContent.dart';
+import 'package:emp_sys/widgets/early_leave_box.dart';
 import 'package:emp_sys/widgets/multi.dart';
 import 'package:flutter/material.dart';
 import 'package:neumorphic_button/neumorphic_button.dart';
@@ -111,8 +112,9 @@ class HomeScreen extends StatelessWidget {
                 
                 Center(
                       child: NeumorphicButton(
-                    onTap: () {
-                      Provider11.endShiftTime();
+                    onTap: () async{
+                    await  Provider11.endShiftTime();
+                   
                     },
                     child: Container(
                       child: Column(
@@ -185,7 +187,12 @@ class HomeScreen extends StatelessWidget {
                Center(
                       child: NeumorphicButton(
                     onTap: () {
-                     Provider11.doesCollectionExist();
+                      showDialog(
+                                context: context,
+                                builder: (BuildContext context) {
+                                  return DialogBox();
+                                },
+                              );
                     },
                     child: Container(
                       child: Column(

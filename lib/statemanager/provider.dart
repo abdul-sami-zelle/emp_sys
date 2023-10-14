@@ -29,172 +29,10 @@ class Provider1 extends ChangeNotifier {
   String? name_;
   String? age_;
   String? email_;
-  Duration timeInSec = Duration(seconds: 0);
-  bool isRunning = false;
-  String formattedHours = "00";
-  String formattedMinutes = "00";
-  String formattedSeconds = "00";
-  bool? startbuttonenabled = null;
-  String? lastAction = null;
-  String? callbutton;
-  var namazBreakHistory = {};
-  var namazBreak = [];
-  var callBreakHistory = {};
-  var callBreak = [];
-  var lunchBreakHistory = {};
-  var lunchBreak = [];
-  var casualLeaveHistory = {};
-  var casualLeave = [];
-  var summitLeaveHistory = {};
-  var summitLeave = [];
-  var shiftTimeHistory = {};
-  var shiftTime = [];
 
-  final TextEditingController _textController = TextEditingController();
-  String? savedText = '';
-  Timer? timer;
 
-  void saveText() {
-    savedText = _textController.text;
-  }
+  
 
-  void startTimer() {
-    if (lastAction == 'call break') {
-      var endTime = DateTime.now().toString().substring(10, 19);
-      callBreakHistory['endTime'] = endTime.toString();
-      //print(endTime);
-      lastAction = null;
-      notifyListeners();
-      callBreak.add(callBreakHistory);
-      callBreakHistory = {};
-      print(callBreak);
-      print(callBreakHistory);
-      lastAction = null;
-    }
-    if (lastAction == 'summit leave') {
-      var endTime = DateTime.now().toString().substring(10, 19);
-      summitLeaveHistory['endTime'] = endTime.toString();
-      //print(endTime);
-      lastAction = null;
-      notifyListeners();
-      summitLeave.add(summitLeaveHistory);
-      summitLeaveHistory = {};
-      print(summitLeave);
-      print(summitLeaveHistory);
-    }
-    if (lastAction == 'casual leave') {
-      var endTime = DateTime.now().toString().substring(10, 19);
-      casualLeaveHistory['endTime'] = endTime.toString();
-      //print(endTime);
-      lastAction = null;
-      notifyListeners();
-      casualLeave.add(casualLeaveHistory);
-      casualLeaveHistory = {};
-      print(casualLeave);
-      print(casualLeaveHistory);
-    }
-    if (lastAction == 'lunch break') {
-      var endTime = DateTime.now().toString().substring(10, 19);
-      lunchBreakHistory['endTime'] = endTime.toString();
-      //print(endTime);
-      lastAction = null;
-      notifyListeners();
-
-      lunchBreak.add(lunchBreakHistory);
-      lunchBreakHistory = {};
-      print(lunchBreak);
-      print(lunchBreakHistory);
-      lastAction = null;
-    }
-    if (lastAction == 'namaz break') {
-      //print("${namazBreakHistory['startTime']}  start time is here");
-      var endTime = DateTime.now().toString().substring(10, 19);
-      namazBreakHistory['endTime'] = endTime.toString();
-      //print(endTime);
-      lastAction = null;
-      notifyListeners();
-
-      namazBreak.add(namazBreakHistory);
-      namazBreakHistory = {};
-      print(namazBreak);
-      print(namazBreakHistory);
-    }
-    if (startbuttonenabled == true) {
-      var startTime = DateTime.now().toString().substring(10, 19);
-      shiftTimeHistory['StartTime'] = startTime.toString();
-      startbuttonenabled = false;
-      notifyListeners();
-    }
-    timer = Timer.periodic(Duration(seconds: 1), (timer) {
-      timeInSec = timeInSec + Duration(seconds: 1);
-      notifyListeners();
-    });
-    isRunning = true;
-    notifyListeners();
-  }
-
-  void stopTimer() {
-    if (lastAction == 'namaz break') {
-      var startTime = DateTime.now().toString().substring(10, 19);
-      namazBreakHistory['startTime'] = startTime.toString();
-      //print(startTime);
-      print(namazBreakHistory);
-    }
-    if (lastAction == 'casual leave') {
-      var startTime = DateTime.now().toString().substring(10, 19);
-      casualLeaveHistory['startTime'] = startTime.toString();
-      //print(startTime);
-      print(casualLeaveHistory);
-    }
-    if (lastAction == 'summit leave') {
-      var startTime = DateTime.now().toString().substring(10, 19);
-      summitLeaveHistory['startTime'] = startTime.toString();
-      //print(startTime);
-      print(summitLeaveHistory);
-    }
-    if (lastAction == 'call break') {
-      var startTime = DateTime.now().toString().substring(10, 19);
-      callBreakHistory['startTime'] = startTime.toString();
-      //print(startTime);
-      print(callBreakHistory);
-    }
-    if (lastAction == 'lunch break') {
-      var startTime = DateTime.now().toString().substring(10, 19);
-      lunchBreakHistory['startTime'] = startTime.toString();
-      //print(startTime);
-      print(lunchBreakHistory);
-    }
-    isRunning = false;
-    timer?.cancel();
-    notifyListeners();
-  }
-
-  void resetTimer() {
-    if (startbuttonenabled == false) {
-      var endTime = DateTime.now().toString().substring(10, 19);
-      shiftTimeHistory['endTime'] = endTime.toString();
-      shiftTime.add(shiftTimeHistory);
-      print(shiftTimeHistory);
-      shiftTimeHistory = {};
-      print(shiftTime);
-      print(shiftTimeHistory);
-    }
-    isRunning = false;
-    timeInSec = Duration(seconds: 0);
-    timer?.cancel();
-    notifyListeners();
-  }
-
-  // void buttonCheck() {
-  //   if (lastAction == 'break') {
-  //     callbutton = 'enabeled';
-  //   }
-  // }
-
-  @override
-  notifyListeners();
-
-  //login user//
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
   String? uid;
@@ -206,6 +44,8 @@ class Provider1 extends ChangeNotifier {
   String? profile_;
   String? userEmail;
   String? histShiftStart;
+  String? date_;
+  String? db_name;
 
   ResetPassword(String email) async {
     await Firebase.initializeApp();
@@ -258,6 +98,9 @@ class Provider1 extends ChangeNotifier {
             out_ = data['out'];
             profile_ = data['profile'];
             shift_ = data['shift'];
+            date_ = DateTime.now().toString().substring(0, 10);
+            db_name = data['shift']=='Day'?'morning_Shift':'night_Shift';
+
 
             FirebaseFirestore.instance
                 .collection('morning_Shift')
@@ -267,15 +110,9 @@ class Provider1 extends ChangeNotifier {
                 .get()
                 .then((DocumentSnapshot documentSnapshot) {
               if (documentSnapshot.exists) {
-                startbuttonenabled = false;
-                Map<String, dynamic> data =
-                    documentSnapshot.data() as Map<String, dynamic>;
-                histShiftStart = data['startShift'].toString().substring(
-                      11,
-                    );
-                print(histShiftStart);
+                doesCollectionExist(db_name, user!.uid, DateTime.now().toString().substring(0, 10));
               } else {
-                print("not exists");
+                addemployeeData();
               }
             });
 
@@ -302,23 +139,13 @@ class Provider1 extends ChangeNotifier {
     return user;
   }
 
-  CollectionReference morning_Shift =
-      FirebaseFirestore.instance.collection('morning_Shift');
-  Future<void> checkData() async {
-    final collectionName = DateTime.now().toString().substring(0, 10);
-    final collectionReference =
-        morning_Shift.doc(uid).collection(collectionName);
-
-    // Check if the collection exists
-    final collectionSnapshot = await collectionReference.get();
-    dataExist = collectionSnapshot;
-  }
+  
 
   Future<void> addemployeeData() async {
     notifyListeners();
     final collectionName = DateTime.now().toString().substring(0, 10);
     final collectionReference =
-        morning_Shift.doc(uid).collection(collectionName);
+        FirebaseFirestore.instance.collection('$db_name').doc(uid).collection(collectionName);
 
     // Check if the collection exists
     final collectionSnapshot = await collectionReference.get();
@@ -326,15 +153,15 @@ class Provider1 extends ChangeNotifier {
     if (collectionSnapshot.docs.isEmpty) {
       // Collection doesn't exist, create a new one
       return collectionReference.doc(uid).set({
-        'startShift': DateTime.now().toString(),
+        'startShift': "",
         'endShift': "",
         "namazBreak": [],
-        // 'callBreak':[],
         "lunchBreak": [],
-        "Break": [],
-        "casualLeave": [],
-        "summitLeave": [],
+        "casualBreak": [],
+        "summitBreak": [],
         'reason': "",
+        "active": "",
+        "activeStartTime":""
       });
     } else {
       // Collection exists, update it
@@ -347,7 +174,7 @@ class Provider1 extends ChangeNotifier {
 
   Future<void> endShiftDataBase() {
     notifyListeners();
-    return morning_Shift
+    return FirebaseFirestore.instance.collection('$db_name')
         .doc(uid)
         .collection(DateTime.now().toString().substring(0, 10))
         .doc(uid)
@@ -356,78 +183,41 @@ class Provider1 extends ChangeNotifier {
     });
   }
 
+
+
+  Future<void> endShiftDataBaseEarly(String reason) {
+    arrivalButtonsEnability=false;
+    notifyListeners();
+    return FirebaseFirestore.instance.collection('$db_name')
+        .doc(uid)
+        .collection(DateTime.now().toString().substring(0, 10))
+        .doc(uid)
+        .update({
+      'endShift': DateTime.now().toString(),
+      'reason':reason
+    });
+  }
+
+
+
+
+  Future<void> setStartShiftDb() {
+    notifyListeners();
+    return FirebaseFirestore.instance.collection('$db_name')
+        .doc(uid)
+        .collection(DateTime.now().toString().substring(0, 10))
+        .doc(uid)
+        .update({
+      'startShift': DateTime.now().toString(),
+    });
+  }
+
+
+
+
   var lastList = [];
-  // Future<void> callBreakDataBase() {
-  //   notifyListeners();
-  //   return morning_Shift
-  //       .doc(uid)
-  //       .collection(DateTime.now().toString().substring(0, 10))
-  //       .doc(uid)
-  //       .update({
-  //     "callBreak":callBreak,
-  //   });
-  // }
-  Future<void> BreakDataBase() {
-    notifyListeners();
-    return morning_Shift
-        .doc(uid)
-        .collection(DateTime.now().toString().substring(0, 10))
-        .doc(uid)
-        .update({
-      "Break": callBreak,
-    });
-  }
 
-  Future<void> reasonDataBase() {
-    notifyListeners();
-    return morning_Shift
-        .doc(uid)
-        .collection(DateTime.now().toString().substring(0, 10))
-        .doc(uid)
-        .update({
-      "reason": savedText,
-    });
-  }
 
-  Future<void> namazBreakDataBase() {
-    return morning_Shift
-        .doc(uid)
-        .collection(DateTime.now().toString().substring(0, 10))
-        .doc(uid)
-        .update({
-      "namazBreak": namazBreak,
-    });
-  }
-
-  Future<void> lunchBreakDataBase() {
-    return morning_Shift
-        .doc(uid)
-        .collection(DateTime.now().toString().substring(0, 10))
-        .doc(uid)
-        .update({
-      "lunchBreak": lunchBreak,
-    });
-  }
-
-  Future<void> casualLeaveDataBase() {
-    return morning_Shift
-        .doc(uid)
-        .collection(DateTime.now().toString().substring(0, 10))
-        .doc(uid)
-        .update({
-      "casualLeave": casualLeave,
-    });
-  }
-
-  Future<void> summitLeaveDataBase() {
-    return morning_Shift
-        .doc(uid)
-        .collection(DateTime.now().toString().substring(0, 10))
-        .doc(uid)
-        .update({
-      "summitLeave": summitLeave,
-    });
-  }
 
   String findTimeDifference(String startTime, String endTime) {
     // Define a time format pattern to parse the time strings
@@ -456,171 +246,6 @@ class Provider1 extends ChangeNotifier {
       return ""; // Return an empty string in case of an error
     }
   }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// 
-
-// String getTimeDifference(String startTimeStr, String endTimeStr) {
-//   List<int> startTimeParts = startTimeStr.split(':').map(int.parse).toList();
-//   List<int> endTimeParts = endTimeStr.split(':').map(int.parse).toList();
-
-//   DateTime startTime = DateTime(0, 1, 1, startTimeParts[0], startTimeParts[1], startTimeParts[2]);
-//   DateTime endTime = DateTime(0, 1, 1, endTimeParts[0], endTimeParts[1], endTimeParts[2]);
-
-//   Duration difference = endTime.difference(startTime);
-
-//   String twoDigits(int n) => n.toString().padLeft(2, '0');
-//   int hours = difference.inHours;
-//   int minutes = difference.inMinutes % 60;
-//   int seconds = difference.inSeconds % 60;
-
-//   return '${twoDigits(hours)}:${twoDigits(minutes)}:${twoDigits(seconds)}';
-// }
-
-
-
-
-
-
-
-// String? differenceShiftTime(String? time1, String? time2) {
-
-//   if (time1 ==null || time2 ==null) {
-//     return "null";
-//   } else {
-//      // Parse the string times into DateTime objects
-//   DateFormat format = DateFormat("HH:mm:ss");
-//   DateTime dateTime1 = format.parse(time1);
-//   DateTime dateTime2 = format.parse(time2);
- 
-//   // Calculate the time difference
-//   Duration difference = dateTime2.difference(dateTime1);
-
-//   // Convert the time difference to hours
-//   String hoursDifference = (difference.inMinutes / 60.0).toString().substring(0,3);
-//     // Extract hours, minutes, and seconds from the time difference
-//   int hours = difference.inHours;
-//   int minutes = (difference.inMinutes % 60);
-//   int seconds = (difference.inSeconds % 60);
-
-//   // Format the time difference as "HH:mm:ss"
-//   String formattedDifference = '$hours:${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}';
-
-//   return formattedDifference;
-
-//   }
-  
-// }
-
-// String? statusCategorization(String dailyArrival) {
-//   String actualArrivalTime = "08:00:00 AM";
-
-//   String arrivalCategory = categorizeArrival(actualArrivalTime, dailyArrival);
-//   return arrivalCategory;
-// }
-
-// String categorizeArrival(String actualArrivalTime, String dailyArrival) {
-//   // Parse the actual and daily arrival times
-//   DateFormat format = DateFormat("hh:mm:ss a");
-//   DateTime actualTime = format.parse(actualArrivalTime);
-
-//   // Extract hours, minutes, and seconds from the daily arrival
-//   List<String> dailyArrivalParts = dailyArrival.split(":");
-//   int dailyHours = int.parse(dailyArrivalParts[0]);
-//   int dailyMinutes = int.parse(dailyArrivalParts[1]);
-//   int dailySeconds = int.parse(dailyArrivalParts[2]);
-
-//   // Create a DateTime object for the daily arrival time
-//   DateTime dailyTime = DateTime(
-//     actualTime.year,
-//     actualTime.month,
-//     actualTime.day,
-//     dailyHours,
-//     dailyMinutes,
-//     dailySeconds,
-//   );
-
-//   // Define a threshold of 15 minutes
-//   Duration lateThreshold = Duration(minutes: 15);
-
-//   // Calculate the time difference
-//   Duration timeDifference = dailyTime.difference(actualTime);
-
-//   if (timeDifference > lateThreshold) {
-//     lateArrival.add(double.parse(timeDifference.inMinutes.toString()));
-//     late15min.add(0);
-//     onTimemArrival.add(0);
-//     return timeDifference.inMinutes.toString();
-//   } 
-//   else if(timeDifference <= lateThreshold && timeDifference>Duration(minutes: 0,hours: 0,seconds: 0)){
-//     lateArrival.add(0);
-//     onTimemArrival.add(0);
-//     late15min.add(double.parse(timeDifference.inMinutes.toString()));
-//     return timeDifference.inMinutes.toString();
-//   }
-//   else {
-//     print(timeDifference);
-//     lateArrival.add(0);
-//     late15min.add(0);
-//     onTimemArrival.add(double.parse(timeDifference.inMinutes<0?(timeDifference.inMinutes*-1).toString():timeDifference.inMinutes.toString()));
-//     return timeDifference.inMinutes.toString();
-//   }
-// }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -825,129 +450,13 @@ return attendanceMonths;
 
 
 
-
-//fetch attendance data 
-
-
-void increament(){
-  index++;
-
-}
-
-void decreament(){
-  index--;
-  
-}
-
-List<double> lateArrival = [];
-
-List<double> onTimemArrival = [];
-
-List<double> late15min = [];
-
-int index = 0; 
-
-  var attenData = [];
-
-  var attenDates = [];
-
-  late GlobalKey<SfCartesianChartState> _cartesianChartKey;
-
-Future fetchFireBaseData(String selectedValue)async{
-  final ref = FirebaseDatabase.instance.ref();
-final snapshot = await ref.child('attendence/${selectedValue}/Day').get();
-if (snapshot.exists) {
-  final Map<String, dynamic> data = snapshot.value as Map<String, dynamic>;
-
-    // Initialize an empty Map to store the data for the specified UID
-    final Map<String, dynamic> uidData = {};
-    
-    // Specify the UID you want to retrieve
-    final desiredUid = "2dCXtkkraFST33jeRvgG4WWkT9i2";
-
-    // Loop through the data and extract data for the desired UID
-    data.forEach((date, dateData) {
-      if (dateData.containsKey(desiredUid)) {
-        increament();
-       
-        uidData[date] = dateData[desiredUid];
-       
-        print(uidData[date]['checkin'].toString());
-        uidData[date]['checkin']==null?decreament():graphData.add(AttendanceChartData1(x: date, y:statusCategorization(uidData[date]['checkin']), early: onTimemArrival[index-1], late: lateArrival[index-1], late15:late15min[index-1]));
-      }
-    });
-    print("${uidData} data is herere");
-
-    final Map<String, dynamic> finalData = sorting(uidData);
-    for (var i = 0; i < finalData.length; i++) {
-      print("${finalData.keys.toList()[i]} ---> ${i}");
-        attendanceDataPdf.add(Timings(checkin:finalData.values.toList()[i]['checkin']==null?"null":finalData.values.toList()[i]['checkin'], checkout:finalData.values.toList()[i]['checkout']==null?"null":finalData.values.toList()[i]['checkout'], date:finalData.keys.toList()[i].toString(), workingHours:finalData.values.toList()[i]['checkin']==null||finalData.values.toList()[i]['checkout']==null?"nil": getTimeDifference(finalData.values.toList()[i]['checkin'].toString(),finalData.values.toList()[i]['checkout'].toString()), status:finalData.values.toList()[i]['checkin']==null?"nil": statusCategorization2(finalData.values.toList()[i]['checkin'].toString())));
-
-    }
-    // Print the extracted data for the specified UID
-    attenData=finalData.values.toList();
-    attenDates = finalData.keys.toList();
-    print(lateArrival);
-    print(onTimemArrival);
-    print(late15min);
-
-    for (var i = 0; i < graphData.length; i++) {
-      print("${graphData[i].early}  ${graphData[i].late}  ${graphData[i].late15}");
-    }
-
-   
-    
-} else {
-    print('No data available.');
-}
-
-
-
-
-
-return attenData;
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-List<int>? imgGraph;
-
-
-   Future<List?> renderChartAsImage() async {
-  final double pixelRatio = 2.0; // Try using a lower pixel ratio (e.g., 2.0)
-  final ui.Image data = await _cartesianChartKey.currentState!.toImage(pixelRatio: pixelRatio);
-  final ByteData? bytes = await data.toByteData(format: ui.ImageByteFormat.png);
-  final Uint8List imageBytes = bytes!.buffer.asUint8List(bytes.offsetInBytes, bytes.lengthInBytes);
-  imgGraph=imageBytes;
-  print(imgGraph);
-  return imageBytes;
-}
-
-
-
-
-
 // database variable names:
 
 // for call break list:
-String callBreakListDBName = 'Break';
+String callBreakListDBName = 'callBreak';
 
 // for casual break list:
-String casualBreakListDBName = 'casualLeave';
+String casualBreakListDBName = 'casualBreak';
 
 // for lunch break list:
 String lunchBreakListDBName = 'lunchBreak';
@@ -956,7 +465,7 @@ String lunchBreakListDBName = 'lunchBreak';
 String namazBreakListDBName = 'namazBreak';
 
 // for summit break
-String summitBreakListDBName = 'summitLeave';
+String summitBreakListDBName = 'summitBreak';
 
 
 
@@ -1137,9 +646,9 @@ String? lastCheckout;
 String? lastShiftStart;
 String? lastShiftEnd;
 
-lastStats()async{
+lastStats(String month , String shift,String date,String uid )async{
   final ref = FirebaseDatabase.instance.ref();
-  final snapshot = await ref.child('attendence/October 2023/Day/12-10-2023/2dCXtkkraFST33jeRvgG4WWkT9i2').get();
+  final snapshot = await ref.child('attendence/$month/$shift/$date/$uid').get();
   Map<String,dynamic> data = snapshot.value as Map<String,dynamic>;
   print(snapshot.value);
   lastCheckin = data['checkin'];
@@ -1164,17 +673,53 @@ Duration summitBreakSum = Duration();
 Duration casualBreakSum = Duration();
 
 
+bool arrivalButtonsEnability = true;
+
+
+changeArrivalButtonAvai(){
+  arrivalButtonsEnability = false;
+  notifyListeners();
+}
+
+
 
 // check either collection exist or not?
 
-Future<bool> doesCollectionExist() async {
+Future<bool> doesCollectionExist(String? shift ,String uid ,String date) async {
   try {
-    final DocumentSnapshot document = await FirebaseFirestore.instance.collection('morning_Shift').doc('2dCXtkkraFST33jeRvgG4WWkT9i2').collection('2023-10-01').doc('2dCXtkkraFST33jeRvgG4WWkT9i2').get();
+    final DocumentSnapshot document = await FirebaseFirestore.instance.collection(shift!).doc(uid).collection(date).doc(uid).get();
     if (document.exists) {
       Map<String,dynamic> data = document.data() as Map<String,dynamic>;
-        // Initialize variables to store the sum of durations
-  // Iterate through callBreak and calculate the sum of durations
- data["$callBreakListDBName"]!=[]? data["$callBreakListDBName"].forEach((item) {
+
+      if ((data['startShift']!="") && (data['endShift']!="")) {
+        submittedShiftStart=data['startShift'];
+        submittedShiftEnd=data['endShift'];
+        print("your todays shift is complete");
+         await changeArrivalButtonAvai();
+      } else if((data['startShift']!="") && (data['endShift']=="")) {
+        submittedShiftStart=data['startShift'];
+       await enableShiftStartButton();
+       if ((data['active']!="") && (data['activeStartTime']!="")) {
+         checkEnabilityBreakBtn(data['active'].toString(),data['activeStartTime'].toString());
+       } else {
+         
+       }
+        print("your todays shift is  at ${data['startShift']}");
+      }
+      
+      else{
+
+      }
+
+
+  await yesterdayDateData();
+ await lastStats(yesterDay_month!, "Day", yesterDay_date!, uid);
+
+
+
+
+
+ (data["$callBreakListDBName"]!=[])? data["$callBreakListDBName"].forEach((item) {
     final List<dynamic> durationParts = item["duration"].split(':').map(int.parse).toList();
     final Duration duration = Duration(
       hours: durationParts[0],
@@ -1188,7 +733,7 @@ Future<bool> doesCollectionExist() async {
 
 
   // Iterate through namazBreak and calculate the sum of durations
- data["$namazBreakListDBName"]!=[]? data["$namazBreakListDBName"].forEach((item) {
+ (data["$namazBreakListDBName"]!=[])? data["$namazBreakListDBName"].forEach((item) {
     final List<dynamic> durationParts = item["duration"].split(':').map(int.parse).toList();
     final Duration duration = Duration(
       hours: durationParts[0],
@@ -1199,7 +744,7 @@ Future<bool> doesCollectionExist() async {
   }):null;
 
   // Iterate through lunchBreak and calculate the sum of durations
- data["$lunchBreakListDBName"]!=[]? data["$lunchBreakListDBName"].forEach((item) {
+ (data["$lunchBreakListDBName"]!=[])? data["$lunchBreakListDBName"].forEach((item) {
     final List<dynamic> durationParts = item["duration"].split(':').map(int.parse).toList();
     final Duration duration = Duration(
       hours: durationParts[0],
@@ -1211,7 +756,7 @@ Future<bool> doesCollectionExist() async {
 
 
     // Iterate through casualBreak and calculate the sum of durations
- data["$casualBreakListDBName"]!=[]? data["$casualBreakListDBName"].forEach((item) {
+ (data["$casualBreakListDBName"]!=[])? data["$casualBreakListDBName"].forEach((item) {
     final List<dynamic> durationParts = item["duration"].split(':').map(int.parse).toList();
     final Duration duration = Duration(
       hours: durationParts[0],
@@ -1223,7 +768,7 @@ Future<bool> doesCollectionExist() async {
 
 
       // Iterate through summitBreak and calculate the sum of durations
-  data["$summitBreakListDBName"]!=[]? data["$summitBreakListDBName"].forEach((item) {
+  (data["$summitBreakListDBName"]!=[])? data["$summitBreakListDBName"].forEach((item) {
     final List<dynamic> durationParts = item["duration"].split(':').map(int.parse).toList();
     final Duration duration = Duration(
       hours: durationParts[0],
@@ -1240,25 +785,12 @@ Future<bool> doesCollectionExist() async {
   print("Total Lunch Break Duration: $summitBreakSum");
 
 
- lastStats();
+
 
 
 
       // coditions for checking either he started shift or end or not
-      if (data['startShift']!="" && data['endShift']!="") {
-        print("your todays shift is complete");
-      } else if(data['startShift']!="" && data['endShift']=="") {
-       await enableShiftStartButton();
-       if (data['active']!="" && data['activeStartTime']!="") {
-         checkEnabilityBreakBtn(data['active'].toString(),data['activeStartTime'].toString());
-       } else {
-         
-       }
-        print("your todays shift is  at ${data['startShift']}");
-      }
-      else{
-
-      }
+    
       //--
       
     } else {
@@ -1280,10 +812,10 @@ Future<bool> doesCollectionExist() async {
 
   Future<void> updateActiveData(var breakOf) {
     
-    return morning_Shift
-        .doc("2dCXtkkraFST33jeRvgG4WWkT9i2")
-        .collection("2023-10-01")
-        .doc("2dCXtkkraFST33jeRvgG4WWkT9i2")
+    return FirebaseFirestore.instance.collection('$db_name')
+        .doc("$uid")
+        .collection("$date_")
+        .doc("$uid")
         .update({
       "active": breakOf.toString(),
       "activeStartTime":DateTime.now().toString().substring(11,19)
@@ -1293,10 +825,10 @@ Future<bool> doesCollectionExist() async {
 
   Future<void> updateActiveDataLocally(var breakOf) {
     FirebaseFirestore.instance.enablePersistence();
-    return morning_Shift
-        .doc("2dCXtkkraFST33jeRvgG4WWkT9i2")
-        .collection("2023-10-01")
-        .doc("2dCXtkkraFST33jeRvgG4WWkT9i2")
+    return FirebaseFirestore.instance.collection('$db_name')
+        .doc("$uid")
+        .collection("$date_")
+        .doc("$uid")
         .update({
        "active": breakOf.toString(),
        "activeStartTime":DateTime.now().toString().substring(11,19)
@@ -1307,10 +839,10 @@ Future<bool> doesCollectionExist() async {
 
   Future<void> updateActivetoNull() {
     
-    return morning_Shift
-        .doc("2dCXtkkraFST33jeRvgG4WWkT9i2")
-        .collection("2023-10-01")
-        .doc("2dCXtkkraFST33jeRvgG4WWkT9i2")
+    return FirebaseFirestore.instance.collection('$db_name')
+        .doc("$uid")
+        .collection("$date_")
+        .doc("$uid")
         .update({
       "active": "",
       "activeStartTime":""
@@ -1324,10 +856,10 @@ Future<bool> doesCollectionExist() async {
 
   Future<void> updateActivetoNullLocally() {
     FirebaseFirestore.instance.enablePersistence();
-    return morning_Shift
-        .doc("2dCXtkkraFST33jeRvgG4WWkT9i2")
-        .collection("2023-10-01")
-        .doc("2dCXtkkraFST33jeRvgG4WWkT9i2")
+    return FirebaseFirestore.instance.collection('$db_name')
+        .doc("$uid")
+        .collection("$date_")
+        .doc("$uid")
         .update({
       "active": "",
       "activeStartTime":""
@@ -1354,6 +886,28 @@ Future<bool> doesCollectionExist() async {
 
 
 
+ String? yesterDay_date;
+ String? yesterDay_month;
+
+
+yesterdayDateData(){
+   // Get the current date
+  DateTime currentDate = DateTime.now();
+
+  // Calculate yesterday's date
+  DateTime yesterdayDate = currentDate.subtract(Duration(days: 1));
+
+  // Format yesterday's date as "yyyy-MM-dd"
+  String formattedDate = DateFormat('dd-MM-yyyy').format(yesterdayDate);
+
+  // Format the month name as "MMMM yyyy"
+  String formattedMonth = DateFormat('MMMM yyyy').format(yesterdayDate);
+  yesterDay_date = formattedDate;
+  yesterDay_month = formattedMonth;
+  notifyListeners();
+  print('Yesterday\'s date: $formattedDate');
+  print('Month: $formattedMonth');
+}
 
 
 
@@ -1375,11 +929,6 @@ Future<bool> doesCollectionExist() async {
 
 
 
-
-
-
-
-var stack_namaz_data =[];
 
 
 
@@ -1464,6 +1013,9 @@ String getTimeDifference(String startTimeStr, String endTimeStr) {
   String? startTime;
   String? endTime;
 
+  String? submittedShiftStart;
+  String? submittedShiftEnd;
+
   bool shiftStarted = false;
   bool breakActive = false;
 
@@ -1490,6 +1042,7 @@ String getTimeDifference(String startTimeStr, String endTimeStr) {
   startShiftTime()async {
     
     startTime = DateTime.now().toString();
+    setStartShiftDb();
     shiftStarted = true;
     print(startTime);
     notifyListeners();
@@ -1498,13 +1051,11 @@ String getTimeDifference(String startTimeStr, String endTimeStr) {
   endShiftTime() async{
     await checkInternetConnectivity();
     if (internetAvailabilty=="yes") {
-      if (stack_namaz_data.length!=0) {
-        updateBreaksData2(stack_namaz_data);
-      } else {
-        
-      }
+      await endShiftDataBase();
+      arrivalButtonsEnability=false;
       endTime = DateTime.now().toString();
       shiftStarted = false;
+      
       print(endTime);
     } else {
       print("nottt");
@@ -1512,6 +1063,27 @@ String getTimeDifference(String startTimeStr, String endTimeStr) {
     
     notifyListeners();
   }
+
+
+
+    endShiftTimeEarly(String reason) async{
+    await checkInternetConnectivity();
+    if (internetAvailabilty=="yes") {
+      await endShiftDataBaseEarly(reason);
+      submittedShiftEnd = DateTime.now().toString();
+      arrivalButtonsEnability=false;
+      endTime = DateTime.now().toString();
+      shiftStarted = false;
+      
+      print(endTime);
+    } else {
+      print("nottt");
+    }
+    
+    notifyListeners();
+  }
+
+
 
 
 
@@ -1534,10 +1106,10 @@ checkInternetConnectivity() async {
 
   Future<void> updateBreaksData2(var data) {
     
-    return morning_Shift
-        .doc("2dCXtkkraFST33jeRvgG4WWkT9i2")
-        .collection("2023-10-01")
-        .doc("2dCXtkkraFST33jeRvgG4WWkT9i2")
+    return FirebaseFirestore.instance.collection('$db_name')
+        .doc("$uid")
+        .collection("$date_")
+        .doc("$uid")
         .update({
       "namazBreak": FieldValue.arrayUnion(data),
     });
@@ -1545,10 +1117,10 @@ checkInternetConnectivity() async {
 
 
   Future<void> updateBreaksData(var data , var dataFor) {
-    return morning_Shift
-        .doc("2dCXtkkraFST33jeRvgG4WWkT9i2")
-        .collection("2023-10-01")
-        .doc("2dCXtkkraFST33jeRvgG4WWkT9i2")
+    return FirebaseFirestore.instance.collection('$db_name')
+        .doc("$uid")
+        .collection("$date_")
+        .doc("$uid")
         .update({
       "$dataFor": FieldValue.arrayUnion([data]),
     });
@@ -1557,10 +1129,10 @@ checkInternetConnectivity() async {
   
   Future<void> updateBreaksDataLocally(var data , var dataFor)async {
     FirebaseFirestore.instance.enablePersistence();
-    return morning_Shift
-        .doc("2dCXtkkraFST33jeRvgG4WWkT9i2")
-        .collection("2023-10-01")
-        .doc("2dCXtkkraFST33jeRvgG4WWkT9i2")
+    return FirebaseFirestore.instance.collection('$db_name')
+        .doc("$uid")
+        .collection("$date_")
+        .doc("$uid")
         .update({
       "$dataFor": FieldValue.arrayUnion([data]),
     });
@@ -1585,10 +1157,10 @@ checkInternetConnectivity() async {
           callBreakSum += timeDifference(call_break_dict['startTime'], call_break_dict['endTime']);
           await checkInternetConnectivity();
            if (internetAvailabilty=="yes") {
-           updateBreaksData(call_break_dict,"Break");
+           updateBreaksData(call_break_dict,"callBreak");
           await updateActivetoNull();
           } else {
-            updateBreaksDataLocally(call_break_dict,"Break");
+            updateBreaksDataLocally(call_break_dict,"callBreak");
             updateActivetoNull();
           }
           call_break_dict={};
@@ -1692,11 +1264,11 @@ checkInternetConnectivity() async {
           casualBreakSum += timeDifference(casual_break_dict['startTime'], casual_break_dict['endTime']);
           await checkInternetConnectivity();
           if (internetAvailabilty=="yes") {
-          updateBreaksData(casual_break_dict,"casualLeave");
+          updateBreaksData(casual_break_dict,"casualBreak");
           updateActivetoNull();
           } else {
             
-            updateBreaksDataLocally(casual_break_dict,"casualLeave");
+            updateBreaksDataLocally(casual_break_dict,"casualBreak");
             updateActivetoNullLocally();
           }
           casual_break_dict={};
@@ -1803,6 +1375,123 @@ checkInternetConnectivity() async {
     activeTabTimeTracked = tabIndex;
     notifyListeners();
   }
+
+
+
+
+
+  clearProvider(){
+    uid = null;
+shift_ = null;
+empId_ = null;
+hours_ = null;
+in_ = null;
+out_ = null;
+profile_ = null;
+userEmail = null;
+histShiftStart = null;
+date_ = null;
+db_name = null;
+lastList = [];
+graphData = [];
+attendanceDataPdf = [];
+data2 = {};
+attendanceMonths=[];
+
+
+
+
+
+timee = [];
+lastCheckin = null;
+lastCheckout = null;
+lastShiftStart = null;
+lastShiftEnd = null;
+alreadyActiveTime = null;
+alreadyActive = null;
+
+
+ namazBreakSum = Duration();
+ lunchBreakSum = Duration();
+ callBreakSum = Duration();
+ summitBreakSum = Duration();
+ casualBreakSum = Duration();
+arrivalButtonsEnability = true;
+
+ yesterDay_date = null;
+ yesterDay_month = null;
+
+
+ endTime = null;
+ startTime = null;
+
+ submittedShiftStart = null;
+ submittedShiftEnd = null;
+
+   shiftStarted = false;
+   breakActive = false;
+
+   call_break = false;
+   namaz_break = false;
+   lunch_break = false;
+   casual_break = false;
+   summit_break = false;
+
+activeBreakIndex = null;
+
+
+   call_break_dict={};
+   call_break_list =[];
+
+   namaz_break_dict={};
+   namaz_break_list =[];
+
+   lunch_break_dict={};
+   lunch_break_list =[];
+
+   casual_break_dict={};
+   casual_break_list =[];
+
+   summit_break_dict={};
+   summit_break_list =[];
+
+   activeTab = 0;
+
+   activeTabTimeTracked = 0;
+
+
+notifyListeners();
+
+
+
+
+
+
+
+
+  }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }
 
 class TimeTrackingData {

@@ -11,6 +11,7 @@ import 'package:provider/provider.dart';
 import 'package:animate_gradient/animate_gradient.dart';
 import 'package:typewritertext/typewritertext.dart';
 import '../statemanager/provider.dart';
+import 'package:glassmorphism_ui/glassmorphism_ui.dart';
 
 class LoginPage extends StatefulWidget {
   LoginPage({super.key});
@@ -97,7 +98,7 @@ class _LoginPageState extends State<LoginPage> {
                                     textAlign: TextAlign.left,
                                     style: GoogleFonts.montserrat(
                       textStyle: TextStyle(color: Colors.white, letterSpacing: 0.2,
-                      fontSize:(size.width>1245)?50:(size.width<1246 && size.width>1100)? 45:30,
+                      fontSize:(size.width>1245)?50:(size.width<1246 && size.width>1100)? 40:(size.width>799 && size.width<1000)?20:30,
                       fontWeight: FontWeight.bold),
                     ),),
                                 duration: const Duration(milliseconds: 200)),
@@ -105,7 +106,7 @@ class _LoginPageState extends State<LoginPage> {
                         ),
                             Visibility(
                               visible: !isVisible,
-                              child: Container(height: 100,width: 100,)),
+                              child: Container(height:(size.width>799 && size.width<1000)?50: 100,width: 100,)),
                             Visibility(
       visible: isVisible,
       child: TweenAnimationBuilder(
@@ -116,17 +117,17 @@ class _LoginPageState extends State<LoginPage> {
                           // horizontal disposition of the widget.
                           return Transform.translate(
                             offset:
-                                Offset(value * MediaQuery.of(context).size.width/20,0),
+                                Offset( (size.width>799 && size.width<1000)?value * MediaQuery.of(context).size.width/30:value * MediaQuery.of(context).size.width/20,0),
                             child: child,
                           );
                         },
         child: Container(
-                                height: 100,
+                               height:(size.width>799 && size.width<1000)?50: 100,
                                width: size.width/1.5,
                                 child: Row(
                               mainAxisAlignment: MainAxisAlignment.start,
                                 children: <Widget>[
-                                  const SizedBox(width: 20.0, height: 100.0),
+                                   SizedBox(width: 20.0, height: 100.0),
                                   Multi(color: Colors.white, subtitle: "Ignite", weight: FontWeight.bold, size: 7),
                                   SizedBox(width: 20.0, height: 100.0),
                                   DefaultTextStyle(
@@ -136,6 +137,7 @@ class _LoginPageState extends State<LoginPage> {
                                       
                                     ),
                                     child: AnimatedTextKit(
+                                      repeatForever: true,
                                       animatedTexts: [
                                         RotateAnimatedText('Your Passion, Fuel Your Success.',duration: Duration(milliseconds: 5000) ,textStyle:GoogleFonts.montserrat(
                         textStyle: TextStyle(color: Colors.white, letterSpacing: 0.2,fontSize: 7.sp,fontWeight: FontWeight.bold),)),
@@ -161,207 +163,187 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                   ),
                   Expanded(
-                    flex: 5,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        // const Padding(
-                        //   padding: EdgeInsets.fromLTRB(0, 5, 0, 10),
-                        //   child: Text(
-                        //     'HI',
-                        //     style: TextStyle(
-                        //         fontSize: 45,
-                        //         fontWeight: FontWeight.w400,
-                        //         color: Color.fromARGB(255, 255, 255, 255)),
-                        //   ),
-                        // ),
-                        // const Padding(
-                        //   padding: EdgeInsets.fromLTRB(0, 5, 0, 5),
-                        //   child: Text(
-                        //     'WELCOME BACK',
-                        //     style: TextStyle(
-                        //         fontSize: 65,
-                        //         fontWeight: FontWeight.w400,
-                        //         color: Color.fromARGB(255, 255, 255, 255)),
-                        //   ),
-                        // ),
-                        Stack(
-                          clipBehavior: Clip.none,
-                          children: [
-                             Positioned(
-bottom: 5,
-right: 5,
-                               child: Container(
-                                height: size.height/1.2,
-                                width: 500,
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(10),
-                                  color: Colors.white,
-                                ),
-                             
-                                                         ),
-                             ),
-                            Container(
-                              height: size.height/1.2,
-                              width: 500,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(10),
-                                color: Colors.black,
-                              ),
-                              child: Padding(
-                                padding:EdgeInsets.symmetric(horizontal: 20),
-                                child: Form(
-                                  key: _formKey,
-                                  
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Row(
-                                        mainAxisAlignment: MainAxisAlignment.center,
-                                        children: [
-                                          Image.network("https://res.cloudinary.com/diecwxxmm/image/upload/v1696918288/zellesolutions%20portal/i9ikjvb1nyv580ezkcv8.png",height: 70,width: 70,),
-                                        ],
-                                      ),
-                                      SizedBox(height: 20,),
-                                      Text(
-                                        'Email',
-                                        style: TextStyle(
-                                          fontWeight: FontWeight.w600,
-                                          fontSize: 15,
-                                          color: Colors.white,
+                    flex: (size.width>799 && size.width<1000)?7:5,
+                    child: Padding(
+                      padding:  EdgeInsets.only(
+                        right: (size.width>799 && size.width<1000)?20:
+                        (size.width>999 && size.width<1201)?25
+                        :0
+                      ),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          // const Padding(
+                          //   padding: EdgeInsets.fromLTRB(0, 5, 0, 10),
+                          //   child: Text(
+                          //     'HI',
+                          //     style: TextStyle(
+                          //         fontSize: 45,
+                          //         fontWeight: FontWeight.w400,
+                          //         color: Color.fromARGB(255, 255, 255, 255)),
+                          //   ),
+                          // ),
+                          // const Padding(
+                          //   padding: EdgeInsets.fromLTRB(0, 5, 0, 5),
+                          //   child: Text(
+                          //     'WELCOME BACK',
+                          //     style: TextStyle(
+                          //         fontSize: 65,
+                          //         fontWeight: FontWeight.w400,
+                          //         color: Color.fromARGB(255, 255, 255, 255)),
+                          //   ),
+                          // ),
+                          Stack(
+                            clipBehavior: Clip.none,
+                            children: [
+                          
+                              GlassContainer(
+                                border: Border.fromBorderSide(BorderSide.none),
+                                    shadowStrength: 5,
+                                    borderRadius: BorderRadius.circular(16),
+                                    shadowColor: Colors.white.withOpacity(0.24),
+                                height: size.height/1.5,
+                                  width:(size.width>799 && size.width<901)?450: 400,
+                                  blur: 8,
+                      color: Colors.black.withOpacity(0.1),
+                                child: Padding(
+                                  padding:EdgeInsets.symmetric(horizontal: 20),
+                                  child: Form(
+                                    key: _formKey,
+                                    
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        Row(
+                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          children: [
+                                            Image.asset("assets/images/zelle.png",height: 90,width: 150,color: Colors.white,),
+                                          ],
                                         ),
-                                      ),
-                                      SizedBox(height: 20,),
-                                      Container(
-                                        decoration: BoxDecoration(
-                                            borderRadius: BorderRadius.circular(5),
-                                            border: const GradientBoxBorder(
-                                              gradient: LinearGradient(colors: [
-                                                Color.fromARGB(255, 10, 148, 223),
-                                                Color.fromARGB(255, 182, 42, 190)
-                                              ]),
-                                              width: 3,
-                                            )),
-                                        child: TextFormField(
-                                            onFieldSubmitted: (value) {
-                                if (_formKey.currentState!.validate()) {
-                                  Provider11.signInWithEmailPassword(
-                                                email.text, password.text, context);
-                                }
-                                                      },
-                                          controller: email,
-                                          style: const TextStyle(
-                                              fontWeight: FontWeight.w300, color: Colors.white),
-                                          cursorColor: Colors.white,
-                                           validator: (value) =>
-                                          value!.isEmpty ? 'Email cannot be blank' : null,
-                                          decoration: const InputDecoration(
-                                            border: InputBorder.none,
-                                            contentPadding: EdgeInsets.all(8),
-                                            hintText: 'abc@gamil.com',
-                                            hintStyle: TextStyle(
-                                              color: Colors.white,
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                      SizedBox(height: 30,),
-                                      Text(
-                                        'Password',
-                                        style: TextStyle(
-                                          fontWeight: FontWeight.w600,
-                                          fontSize: 15,
-                                          color: Colors.white,
-                                        ),
-                                      ),
-                                      SizedBox(height: 20,),
-                                      Container(
-                                        decoration: BoxDecoration(
-                                            borderRadius: BorderRadius.circular(5),
-                                            border: const GradientBoxBorder(
-                                              gradient: LinearGradient(colors: [
-                                                Color.fromARGB(255, 10, 148, 223),
-                                                Color.fromARGB(255, 182, 42, 190)
-                                              ]),
-                                              width: 3,
-                                            )),
-                                        child: TextFormField(
-                                          onFieldSubmitted: (value) {
-                                if (_formKey.currentState!.validate()) {
-                                  Provider11.signInWithEmailPassword(
-                                                email.text, password.text, context);
-                                }
-                                                      },
-                                          obscureText: true,
-                                          controller: password,
-                                           validator: (value) =>
-                                          value!.isEmpty ? 'Password cannot be blank' : null,
-                                          cursorColor: Colors.white,
-                                          style: const TextStyle(
-                                            color: Colors.white,
-                                          ),
-                                          decoration: const InputDecoration(
-                                            border: InputBorder.none,
-                                            contentPadding: EdgeInsets.all(10),
-                                            hintText: '*********',
-                                            hintStyle: TextStyle(
-                                              color: Colors.white,
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                 SizedBox(height: 30,),
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Container(),
-                                      GestureDetector(
-                                        onTap: () {
-                                
-                                          Navigator.push(context,
-                                       MaterialPageRoute(builder: (context) => ForgotPassword()));
-                                          
-                                        },
-                                        child: Text('Forgot Password',style: TextStyle(fontSize: 15,color: Colors.white,),),),
-                                    ],
-                                  ),
-                                      Padding(
-                                        padding: const EdgeInsets.symmetric(
-                                            vertical: 20, horizontal: 20),
-                                        child:Provider11.loginState==false?  Container(
-                                          height: 44.0,
-                                          width: double.infinity,
+                                        // SizedBox(height: 20,),
+                                       Multi(color: Colors.white, subtitle: "Email", weight: FontWeight.w500, size: 3.7),
+                                        SizedBox(height: 10,),
+                                        Container(
                                           decoration: BoxDecoration(
-                                              borderRadius: BorderRadius.circular(10),
-                                              gradient: const LinearGradient(colors: [
-                                                Color.fromARGB(255, 10, 148, 223),
-                                                Color.fromARGB(255, 182, 42, 190)
-                                              ])),
-                                          child: ElevatedButton(
-                                            onPressed: ()async {
-                                              if (_formKey.currentState!.validate()) {
-                                                Provider11.signInWithEmailPassword(
+                                              borderRadius: BorderRadius.circular(5),
+                                              border: const GradientBoxBorder(
+                                                gradient: LinearGradient(colors: [
+                                                Colors.white,
+                                                Colors.white,
+                                                ]),
+                                                width: 3,
+                                              )),
+                                          child: TextFormField(
+                                              onFieldSubmitted: (value) {
+                                  if (_formKey.currentState!.validate()) {
+                                    Provider11.signInWithEmailPassword(
                                                   email.text, password.text, context);
-                                              }
-                                             
-                                            },
-                                            style: ElevatedButton.styleFrom(
-                                                backgroundColor: Colors.transparent,
-                                                shadowColor: Colors.transparent),
-                                            child: const Text('Log in'),
+                                  }
+                                                        },
+                                            controller: email,
+                                            style: const TextStyle(
+                                                fontWeight: FontWeight.w300, color: Colors.white),
+                                            cursorColor: Colors.white,
+                                             validator: (value) =>
+                                            value!.isEmpty ? 'Email cannot be blank' : null,
+                                            decoration: const InputDecoration(
+                                              border: InputBorder.none,
+                                              contentPadding: EdgeInsets.all(8),
+                                              hintText: 'abc@gamil.com',
+                                              hintStyle: TextStyle(
+                                                color: Colors.white,
+                                              ),
+                                            ),
                                           ),
-                                        ):spinkit,
-                                      ),
-                                    ],
+                                        ),
+                                        SizedBox(height: 30,),
+                                      Multi(color: Colors.white, subtitle: "Password", weight: FontWeight.w500, size: 3.7),
+                                        SizedBox(height: 10,),
+                                        Container(
+                                          decoration: BoxDecoration(
+                                              borderRadius: BorderRadius.circular(5),
+                                              border: const GradientBoxBorder(
+                                                gradient: LinearGradient(colors: [
+                                                  Colors.white,
+                                                     Colors.white,
+                                                ]),
+                                                width: 3,
+                                              )),
+                                          child: TextFormField(
+                                            onFieldSubmitted: (value) {
+                                  if (_formKey.currentState!.validate()) {
+                                    Provider11.signInWithEmailPassword(
+                                                  email.text, password.text, context);
+                                  }
+                                                        },
+                                            obscureText: true,
+                                            controller: password,
+                                             validator: (value) =>
+                                            value!.isEmpty ? 'Password cannot be blank' : null,
+                                            cursorColor: Colors.white,
+                                            style: const TextStyle(
+                                              color: Colors.white,
+                                            ),
+                                            decoration: const InputDecoration(
+                                              border: InputBorder.none,
+                                              contentPadding: EdgeInsets.all(10),
+                                              hintText: '***',
+                                              hintStyle: TextStyle(
+                                                color: Colors.white,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                   SizedBox(height: 10,),
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Container(),
+                                        GestureDetector(
+                                          onTap: () {
+                                  
+                                            Navigator.push(context,
+                                         MaterialPageRoute(builder: (context) => ForgotPassword()));
+                                            
+                                          },
+                                          child: Text('Forgot Password',style: TextStyle(fontSize: 15,color: Colors.white,),),),
+                                      ],
+                                    ),
+                                        Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                              vertical: 20, horizontal: 20),
+                                          child:Provider11.loginState==false?  Container(
+                                            height: 44.0,
+                                            width: double.infinity,
+                                           
+                                            child: ElevatedButton(
+                                              onPressed: ()async {
+                                                if (_formKey.currentState!.validate()) {
+                                                  Provider11.signInWithEmailPassword(
+                                                    email.text, password.text, context);
+                                                }
+                                               
+                                              },
+                                              style: ElevatedButton.styleFrom(
+                                                  backgroundColor: Colors.white,
+                                                  shadowColor: Colors.black,
+                                                  
+                                                  ),
+                                              child: Multi(color: Color(0xff002AC4), subtitle: "Log In", weight: FontWeight.bold, size: 3),
+                                            ),
+                                          ):spinkit,
+                                        ),
+                                      ],
+                                    ),
                                   ),
                                 ),
                               ),
-                            ),
-                            
-                          ],
-                        ),
-                      ],
+                              
+                            ],
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ],
@@ -371,7 +353,11 @@ right: 5,
              Positioned(
             right: 20,
             bottom: 20,
-            child: MultiUnderLined(color: Colors.white, subtitle: "Managed & Powered by Zelle Solutions Pvt Ltd", weight: FontWeight.bold, size: 3))
+            child: MultiUnderLined(color: Colors.white, subtitle: "Managed & Powered by Zelle Solutions Pvt Ltd", weight: FontWeight.bold, size: 3)),
+            Positioned(
+              top: 0,
+              left: 0,
+              child: Image.asset("assets/images/zelle.png",height: 100,width: 200,color: Colors.white,),)
         ],
       ),
     );

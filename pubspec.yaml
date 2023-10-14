@@ -72,6 +72,9 @@ dependencies:
   animate_gradient: ^0.0.2+1
   typewritertext: ^2.3.0
   animated_text_kit: ^4.2.2
+  glassmorphism_ui: ^0.3.0
+  simple_circular_progress_bar: ^1.0.2
+  percent_indicator: ^4.2.3
 
 dev_dependencies:
   flutter_test:
@@ -111,6 +114,7 @@ flutter:
     - assets/images/phone-call.png
     - assets/images/shiftStart.png
     - assets/images/shiftend.png
+    - assets/images/zelle.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

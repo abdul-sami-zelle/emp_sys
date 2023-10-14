@@ -44,7 +44,7 @@ class DialogBox extends StatelessWidget {
               key:_formKey ,
               child: TextFormField(
                  validator: (value) =>
-                  value!.isEmpty ? 'Email cannot be blank' : null,
+                  value!.isEmpty ? 'Reason cannot be blank' : null,
               // onSaved: (value) => _email = value,
             
               controller: reason,
@@ -64,21 +64,10 @@ class DialogBox extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 5),
               child: ElevatedButton(
-                onPressed: () {
+                onPressed: () async{
                  if (_formKey.currentState!.validate()) {
-                     print(reason.text);
-                  Provider11.savedText = reason.text;
-                  print(Provider11.savedText);
-                  Navigator.of(context).pop();
-                  Provider11.savedText == null
-                      ? null
-                      : Provider11.startbuttonenabled != false
-                          ? null
-                          : Provider11.resetTimer();
-                  Provider11.lastAction = null;
-                  Provider11.startbuttonenabled = null;
-                  Provider11.endShiftDataBase();
-                  Provider11.reasonDataBase();
+                await  Provider11.endShiftTimeEarly(reason.text);
+                 Navigator.of(context).pop();
                  }
                 },
                 child: const Text('Enter'),

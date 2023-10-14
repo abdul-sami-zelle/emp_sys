@@ -239,3 +239,133 @@ class LastStatis extends StatelessWidget {
                         );
   }
 }
+
+
+
+
+
+class ResponseSubmitted extends StatelessWidget {
+  const ResponseSubmitted({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final Provider11 = Provider.of<Provider1>(context, listen: true);
+    return    Column(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                                children: [
+                                                  Image.network("https://cdn-icons-png.flaticon.com/128/5610/5610944.png", height: 50,width: 50,),
+                                                  Multi(color: Colors.white, subtitle: "Your Today's Response  has been Subitted", weight: FontWeight.normal, size: 4),
+                                                  Row(
+                                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                    children: [
+                                                      Expanded(
+                              flex: 2,
+                              child:Padding(
+                                padding:EdgeInsets.symmetric(horizontal: 20),
+                                child: Container(
+                                  child:Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Row(
+                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                        children: [
+                                           Multi(
+                                  color: Color(0xff8F95A2),
+                                  subtitle: "Today's Shift Start",
+                                  weight: FontWeight.bold,
+                                  size: 3.5),
+                                          Image.asset("assets/images/shiftstart.png",height: 30,width: 30,),
+                                        ],
+                                      ),
+                                      SizedBoxHeadtoCont(),
+                                      Column(
+                                        children: [
+                                          Row(
+                                crossAxisAlignment: CrossAxisAlignment.end,
+                                // mainAxisAlignment: MainAxisAlignment.end,
+                                children: [
+                                  Digital(
+                                      color: Colors.white,
+                                      subtitle: Provider11.submittedShiftStart.toString().substring(11,19),
+                                      weight: FontWeight.w600,
+                                      size: 5),
+                                  SizedBox(
+                                    width: 4,
+                                  ),
+                                  Multi(
+                                      color: Colors.white,
+                                      subtitle: "",
+                                      weight: FontWeight.w300,
+                                      size: 3),
+                                ],
+                                                          ),
+                                                          SizedBox(
+                                width: 1,
+                                                          ),
+                                                         
+                                        ],
+                                      )
+                                    ],
+                                  ) ,
+                                ),
+                              )  
+                            ),
+                            Expanded(
+                              flex: 2,
+                              child:Padding(
+                                padding:EdgeInsets.symmetric(horizontal: 20),
+                                child: Container(
+                                  child:Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Row(
+                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                        children: [
+                                           Multi(
+                                  color: Color(0xff8F95A2),
+                                  subtitle: "Today's Shift End",
+                                  weight: FontWeight.bold,
+                                  size: 3.5),
+                                          Image.asset("assets/images/shiftend.png",height: 30,width: 30,),
+                                        ],
+                                      ),
+                                      SizedBoxHeadtoCont(),
+                                      Column(
+                                        children: [
+                                          Row(
+                                crossAxisAlignment: CrossAxisAlignment.end,
+                                // mainAxisAlignment: MainAxisAlignment.end,
+                                children: [
+                                  Digital(
+                                      color: Colors.white,
+                                      subtitle: Provider11.submittedShiftEnd.toString().substring(11,19),
+                                      weight: FontWeight.w600,
+                                      size: 5),
+                                  SizedBox(
+                                    width: 4,
+                                  ),
+                                  Multi(
+                                      color: Colors.white,
+                                      subtitle: "",
+                                      weight: FontWeight.w300,
+                                      size: 3),
+                                ],
+                                                          ),
+                                                          SizedBox(
+                                width: 1,
+                                                          ),
+                                                         
+                                        ],
+                                      )
+                                    ],
+                                  ) ,
+                                ),
+                              )  
+                            )
+                                                    ],
+                                                  )
+                                                ],
+                                              );
+  }
+}
